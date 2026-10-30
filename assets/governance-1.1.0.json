@@ -1,0 +1,1632 @@
+{
+  "policy": {
+    "schema_version": "1.0",
+    "policy_version": "1.1.0",
+    "effective_date": "2026-10-26",
+    "knowledge_base_name": "人类3.0知识库",
+    "categories": [
+      {
+        "code": "health",
+        "folder_name": "01_身体与心理健康",
+        "scope": "医学健康、运动营养、睡眠恢复、情绪与心理健康。",
+        "boundary": "抽象逻辑与学习方法归learning；家庭沟通归relationships。",
+        "aliases": [
+          "健康",
+          "运动",
+          "医学",
+          "营养",
+          "睡眠",
+          "心理健康"
+        ]
+      },
+      {
+        "code": "relationships",
+        "folder_name": "02_关系与家庭",
+        "scope": "亲密关系、人际沟通、婚育养育、照护与家庭协作。",
+        "boundary": "疾病诊疗归health；个人投资技术归business_finance。",
+        "aliases": [
+          "家庭",
+          "亲密关系",
+          "婚姻",
+          "育儿",
+          "人际关系"
+        ]
+      },
+      {
+        "code": "learning",
+        "folder_name": "03_学习与认知",
+        "scope": "个人学习方法、信息检索、逻辑推理、证据评价、判断与决策。",
+        "boundary": "面向他人的课程设计或学术研究方法归education_research；纯数学学科知识归math_nature。",
+        "aliases": [
+          "学习方法",
+          "认知",
+          "决策",
+          "逻辑",
+          "证据评价"
+        ]
+      },
+      {
+        "code": "education_research",
+        "folder_name": "04_教育与学术研究",
+        "scope": "教学设计、课程教材、教学评价、研究设计、学术写作与研究规范。",
+        "boundary": "具体学科论文按研究主题归档；不把所有论文都放入本目录。",
+        "aliases": [
+          "教学",
+          "教育",
+          "教材",
+          "科研方法",
+          "研究方法"
+        ]
+      },
+      {
+        "code": "technology_career",
+        "folder_name": "05_专业技术与职业",
+        "scope": "软件编程、AI工具、工程技术、职业规划及专业工作方法。",
+        "boundary": "课程教学材料归education_research；技术的公共制度影响可归society_governance。",
+        "aliases": [
+          "技术",
+          "人工智能",
+          "AI",
+          "软件",
+          "编程",
+          "职业"
+        ]
+      },
+      {
+        "code": "business_finance",
+        "folder_name": "06_商业与财务",
+        "scope": "商业创业、会计财务、预算、投资资产与市场经营知识。",
+        "boundary": "家庭成员协商与责任分配归relationships；宏观制度政治观点归society_governance。",
+        "aliases": [
+          "商业",
+          "财务",
+          "会计",
+          "投资",
+          "理财",
+          "创业"
+        ]
+      },
+      {
+        "code": "society_governance",
+        "folder_name": "07_组织制度与社会",
+        "scope": "组织管理、法律制度、政治治理、公共政策、国际关系及社会问题。",
+        "boundary": "政治哲学的规范性论证可归humanities_arts；主张具体国家制度或政策的文章归本目录。",
+        "aliases": [
+          "政治",
+          "国家制度",
+          "公共政策",
+          "组织管理",
+          "国际关系",
+          "社会"
+        ]
+      },
+      {
+        "code": "math_nature",
+        "folder_name": "08_数学与自然科学",
+        "scope": "数学、物理、化学、生物、地球、天文等基础学科知识。",
+        "boundary": "健康应用归health；统计概率在个人决策中的应用归learning。",
+        "aliases": [
+          "数学",
+          "自然科学",
+          "物理",
+          "化学",
+          "生物",
+          "天文"
+        ]
+      },
+      {
+        "code": "humanities_arts",
+        "folder_name": "09_哲学历史与文化艺术",
+        "scope": "哲学伦理、历史文化、文学语言、艺术审美及思想研究。",
+        "boundary": "具体政治制度与政策评论归society_governance；日常旅行攻略归daily_life。",
+        "aliases": [
+          "哲学",
+          "历史",
+          "文化",
+          "文学",
+          "艺术",
+          "伦理"
+        ]
+      },
+      {
+        "code": "daily_life",
+        "folder_name": "10_日常生活与兴趣",
+        "scope": "衣食住行、居家维修、消费、数码日常、安全应急、旅行娱乐和兴趣实践。",
+        "boundary": "健康营养结论归health；专业软件开发归technology_career。",
+        "aliases": [
+          "生活",
+          "家居",
+          "旅行",
+          "兴趣",
+          "消费",
+          "安全应急"
+        ]
+      },
+      {
+        "code": "inbox",
+        "folder_name": "90_待整理",
+        "scope": "暂时不能确定主分类的内容。",
+        "boundary": "仅作兜底；需要记录待分类原因，后续人工复核。",
+        "aliases": [
+          "待分类",
+          "收件箱",
+          "待整理"
+        ]
+      }
+    ],
+    "life_goals": {
+      "cultivation": "修身",
+      "career": "立业",
+      "family": "齐家",
+      "governance": "治事",
+      "contribution": "济世",
+      "expression": "立言"
+    },
+    "human_dimensions": {
+      "mind": "心智与内在体验",
+      "body": "身体与行为",
+      "spirit": "关系、归属与意义",
+      "vocation": "事业、系统与价值创造"
+    },
+    "content_types": {
+      "concept": "概念",
+      "method": "方法",
+      "procedure": "流程",
+      "case": "案例",
+      "overview": "综述",
+      "viewpoint": "观点",
+      "record": "记录",
+      "practice_review": "实践复盘",
+      "checklist": "清单",
+      "source_material": "原始资料"
+    },
+    "content_natures": {
+      "source_excerpt": "原文摘录",
+      "source_opinion": "作者观点",
+      "ai_synthesis": "AI归纳",
+      "personal_experience": "个人经验"
+    },
+    "verification_states": [
+      "pending",
+      "partially_verified",
+      "verified",
+      "not_applicable"
+    ],
+    "directory_rules": {
+      "initial_root_count": 11,
+      "root_changes": "new_policy_version_and_explicit_user_authorization",
+      "subfolder_changes": "propose_complete_paths_and_confirm_each_batch_then_register_parent_scope_aliases_and_readback",
+      "one_primary_location": true,
+      "semantic_classification_owner": "host_ai",
+      "ambiguous_category": "inbox",
+      "frameworks_are_metadata_only": true,
+      "do_not_upload_rules_or_indexes": true,
+      "no_create_unsupported_move_rename_delete": true,
+      "prefer_shallow": true,
+      "confirm_each_batch": true,
+      "product_depth_limit": null,
+      "numbering": "independent_per_parent_01_topic",
+      "creation_thresholds": "no_item_count_or_expected_growth_or_max_depth_gate",
+      "declined_creation": "use_suitable_existing_directory",
+      "root_bindings": "separate_from_directory_registry"
+    },
+    "naming": {
+      "generated_format": "{title}__{content_type_label}__v{version}.md",
+      "title_max_chars": 80,
+      "version_pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$",
+      "entry_id_format": "UUID",
+      "timely_title_date": "YYYY-MM-DD，使用原文事件或发布日期；采集日期独立记录",
+      "original_files": "keep_original_bytes_and_name; generated_summaries_use_standard_names"
+    },
+    "entry_rules": {
+      "require_sources": true,
+      "require_verification_note_for_verified": true,
+      "verified_is_host_attestation_not_automatic_fact_check": true,
+      "allow_empty_life_goals_and_human_dimensions": true,
+      "body_max_utf8_bytes": 9000000,
+      "default_execute": false,
+      "pending_and_unknown_stop": true,
+      "body_same_across_different_entry_ids": "duplicate",
+      "revision_requires_previous_indexed_version": true,
+      "index_commit_requires_ledger_receipt_and_readback": true,
+      "index_scope": "entries_committed_through_this_governance_contract_only"
+    },
+    "versioning": {
+      "policy": "immutable_version_file_with_active_sha256",
+      "knowledge": "same_entry_id_new_version_new_file",
+      "old_files": "retained_on_ima; native_search_may_return_multiple_versions",
+      "rollback": "switch_active_policy_only_after_binding_compatibility_review; no_remote_rollback"
+    },
+    "framework_sources": [
+      "https://ctext.org/liji/da-xue/zhs",
+      "https://thedankoe.com/letters/human-3-0-a-map-to-reach-the-top-1/"
+    ]
+  },
+  "policy_sha256": "05179a7a4dea08822a198cf21077fadc719c2634438b2bdae165c675ee3a16ec",
+  "schemas": {
+    "policy": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "IMA policy release 1.1.0",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "policy_version": {
+          "const": "1.1.0"
+        },
+        "effective_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "knowledge_base_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "health",
+                  "relationships",
+                  "learning",
+                  "education_research",
+                  "technology_career",
+                  "business_finance",
+                  "society_governance",
+                  "math_nature",
+                  "humanities_arts",
+                  "daily_life",
+                  "inbox"
+                ]
+              },
+              "folder_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "boundary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "minItems": 1,
+                "maxItems": 30
+              }
+            },
+            "required": [
+              "code",
+              "folder_name",
+              "scope",
+              "boundary",
+              "aliases"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 11,
+          "maxItems": 11
+        },
+        "life_goals": {
+          "const": {
+            "cultivation": "修身",
+            "career": "立业",
+            "family": "齐家",
+            "governance": "治事",
+            "contribution": "济世",
+            "expression": "立言"
+          }
+        },
+        "human_dimensions": {
+          "const": {
+            "mind": "心智与内在体验",
+            "body": "身体与行为",
+            "spirit": "关系、归属与意义",
+            "vocation": "事业、系统与价值创造"
+          }
+        },
+        "content_types": {
+          "const": {
+            "concept": "概念",
+            "method": "方法",
+            "procedure": "流程",
+            "case": "案例",
+            "overview": "综述",
+            "viewpoint": "观点",
+            "record": "记录",
+            "practice_review": "实践复盘",
+            "checklist": "清单",
+            "source_material": "原始资料"
+          }
+        },
+        "content_natures": {
+          "const": {
+            "source_excerpt": "原文摘录",
+            "source_opinion": "作者观点",
+            "ai_synthesis": "AI归纳",
+            "personal_experience": "个人经验"
+          }
+        },
+        "verification_states": {
+          "const": [
+            "pending",
+            "partially_verified",
+            "verified",
+            "not_applicable"
+          ]
+        },
+        "directory_rules": {
+          "const": {
+            "initial_root_count": 11,
+            "root_changes": "new_policy_version_and_explicit_user_authorization",
+            "subfolder_changes": "propose_complete_paths_and_confirm_each_batch_then_register_parent_scope_aliases_and_readback",
+            "one_primary_location": true,
+            "semantic_classification_owner": "host_ai",
+            "ambiguous_category": "inbox",
+            "frameworks_are_metadata_only": true,
+            "do_not_upload_rules_or_indexes": true,
+            "no_create_unsupported_move_rename_delete": true,
+            "prefer_shallow": true,
+            "confirm_each_batch": true,
+            "product_depth_limit": null,
+            "numbering": "independent_per_parent_01_topic",
+            "creation_thresholds": "no_item_count_or_expected_growth_or_max_depth_gate",
+            "declined_creation": "use_suitable_existing_directory",
+            "root_bindings": "separate_from_directory_registry"
+          }
+        },
+        "naming": {
+          "const": {
+            "generated_format": "{title}__{content_type_label}__v{version}.md",
+            "title_max_chars": 80,
+            "version_pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$",
+            "entry_id_format": "UUID",
+            "timely_title_date": "YYYY-MM-DD，使用原文事件或发布日期；采集日期独立记录",
+            "original_files": "keep_original_bytes_and_name; generated_summaries_use_standard_names"
+          }
+        },
+        "entry_rules": {
+          "const": {
+            "require_sources": true,
+            "require_verification_note_for_verified": true,
+            "verified_is_host_attestation_not_automatic_fact_check": true,
+            "allow_empty_life_goals_and_human_dimensions": true,
+            "body_max_utf8_bytes": 9000000,
+            "default_execute": false,
+            "pending_and_unknown_stop": true,
+            "body_same_across_different_entry_ids": "duplicate",
+            "revision_requires_previous_indexed_version": true,
+            "index_commit_requires_ledger_receipt_and_readback": true,
+            "index_scope": "entries_committed_through_this_governance_contract_only"
+          }
+        },
+        "versioning": {
+          "const": {
+            "policy": "immutable_version_file_with_active_sha256",
+            "knowledge": "same_entry_id_new_version_new_file",
+            "old_files": "retained_on_ima; native_search_may_return_multiple_versions",
+            "rollback": "switch_active_policy_only_after_binding_compatibility_review; no_remote_rollback"
+          }
+        },
+        "framework_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "minItems": 0,
+          "maxItems": 10
+        }
+      },
+      "required": [
+        "schema_version",
+        "policy_version",
+        "effective_date",
+        "knowledge_base_name",
+        "categories",
+        "life_goals",
+        "human_dimensions",
+        "content_types",
+        "content_natures",
+        "verification_states",
+        "directory_rules",
+        "naming",
+        "entry_rules",
+        "versioning",
+        "framework_sources"
+      ],
+      "additionalProperties": false
+    },
+    "bindings": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "IMA root folder registry 1.1",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "policy_version": {
+          "const": "1.1.0"
+        },
+        "account_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "kb_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "kb_name": {
+          "const": "人类3.0知识库"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "provisioning"
+          ]
+        },
+        "categories": {
+          "type": "object",
+          "properties": {
+            "health": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "01_身体与心理健康"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "relationships": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "02_关系与家庭"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "learning": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "03_学习与认知"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "education_research": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "04_教育与学术研究"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "technology_career": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "05_专业技术与职业"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "business_finance": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "06_商业与财务"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "society_governance": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "07_组织制度与社会"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "math_nature": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "08_数学与自然科学"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "humanities_arts": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "09_哲学历史与文化艺术"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "daily_life": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "10_日常生活与兴趣"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            },
+            "inbox": {
+              "type": "object",
+              "properties": {
+                "folder_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "folder_name": {
+                  "const": "90_待整理"
+                },
+                "parent_folder_id": {
+                  "type": "null"
+                },
+                "verified_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "creation_request_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "folder_id",
+                "folder_name",
+                "parent_folder_id",
+                "verified_at",
+                "creation_request_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "subfolders": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "schema_version",
+        "policy_version",
+        "account_sha256",
+        "kb_id",
+        "kb_name",
+        "status",
+        "categories",
+        "subfolders"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "verified_at"
+            ],
+            "properties": {
+              "categories": {
+                "required": [
+                  "health",
+                  "relationships",
+                  "learning",
+                  "education_research",
+                  "technology_career",
+                  "business_finance",
+                  "society_governance",
+                  "math_nature",
+                  "humanities_arts",
+                  "daily_life",
+                  "inbox"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "entry": {
+      "type": "object",
+      "properties": {
+        "entry_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "version": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[^\\\\/:*?\"<>|\\u0000-\\u001f\\u007f]+$",
+          "allOf": [
+            {
+              "not": {
+                "pattern": "__"
+              }
+            },
+            {
+              "not": {
+                "pattern": "^\\s|[\\s.]$"
+              }
+            }
+          ]
+        },
+        "primary_category": {
+          "type": "string",
+          "enum": [
+            "health",
+            "relationships",
+            "learning",
+            "education_research",
+            "technology_career",
+            "business_finance",
+            "society_governance",
+            "math_nature",
+            "humanities_arts",
+            "daily_life",
+            "inbox"
+          ]
+        },
+        "content_type": {
+          "type": "string",
+          "enum": [
+            "concept",
+            "method",
+            "procedure",
+            "case",
+            "overview",
+            "viewpoint",
+            "record",
+            "practice_review",
+            "checklist",
+            "source_material"
+          ]
+        },
+        "content_natures": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "source_excerpt",
+              "source_opinion",
+              "ai_synthesis",
+              "personal_experience"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 4
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "url",
+                  "book",
+                  "personal",
+                  "provided_material"
+                ]
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              },
+              "author": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "published_date": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            },
+            "required": [
+              "kind",
+              "locator"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "url"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "locator": {
+                      "type": "string",
+                      "format": "uri",
+                      "pattern": "^https?://"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 50
+        },
+        "verification": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "partially_verified",
+            "verified",
+            "not_applicable"
+          ]
+        },
+        "created_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "updated_date": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 9000000
+        },
+        "life_goals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cultivation",
+              "career",
+              "family",
+              "governance",
+              "contribution",
+              "expression"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 6
+        },
+        "human_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "mind",
+              "body",
+              "spirit",
+              "vocation"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "classification_reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "verification_note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "previous_version": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$"
+        },
+        "related_entry_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minItems": 0,
+          "maxItems": 100
+        },
+        "directory_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "entry_id",
+        "version",
+        "title",
+        "primary_category",
+        "content_type",
+        "content_natures",
+        "sources",
+        "verification",
+        "created_date",
+        "updated_date",
+        "body"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "verification": {
+                "const": "verified"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "verification_note"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "primary_category": {
+                "const": "inbox"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "classification_reason"
+            ]
+          }
+        }
+      ],
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "IMA governed knowledge entry 1.1"
+    },
+    "request": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "IMA governance request 1.1",
+      "$defs": {
+        "entry": {
+          "type": "object",
+          "properties": {
+            "entry_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "version": {
+              "type": "string",
+              "maxLength": 20,
+              "pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[^\\\\/:*?\"<>|\\u0000-\\u001f\\u007f]+$",
+              "allOf": [
+                {
+                  "not": {
+                    "pattern": "__"
+                  }
+                },
+                {
+                  "not": {
+                    "pattern": "^\\s|[\\s.]$"
+                  }
+                }
+              ]
+            },
+            "primary_category": {
+              "type": "string",
+              "enum": [
+                "health",
+                "relationships",
+                "learning",
+                "education_research",
+                "technology_career",
+                "business_finance",
+                "society_governance",
+                "math_nature",
+                "humanities_arts",
+                "daily_life",
+                "inbox"
+              ]
+            },
+            "content_type": {
+              "type": "string",
+              "enum": [
+                "concept",
+                "method",
+                "procedure",
+                "case",
+                "overview",
+                "viewpoint",
+                "record",
+                "practice_review",
+                "checklist",
+                "source_material"
+              ]
+            },
+            "content_natures": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "source_excerpt",
+                  "source_opinion",
+                  "ai_synthesis",
+                  "personal_experience"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "url",
+                      "book",
+                      "personal",
+                      "provided_material"
+                    ]
+                  },
+                  "locator": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000
+                  },
+                  "author": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "published_date": {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "locator"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "kind": {
+                          "const": "url"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "locator": {
+                          "type": "string",
+                          "format": "uri",
+                          "pattern": "^https?://"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 50
+            },
+            "verification": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "partially_verified",
+                "verified",
+                "not_applicable"
+              ]
+            },
+            "created_date": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "updated_date": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "body": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 9000000
+            },
+            "life_goals": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "cultivation",
+                  "career",
+                  "family",
+                  "governance",
+                  "contribution",
+                  "expression"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 6
+            },
+            "human_dimensions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "mind",
+                  "body",
+                  "spirit",
+                  "vocation"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 4
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "minItems": 0,
+              "maxItems": 20
+            },
+            "aliases": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "minItems": 0,
+              "maxItems": 20
+            },
+            "classification_reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            },
+            "verification_note": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            },
+            "previous_version": {
+              "type": "string",
+              "maxLength": 20,
+              "pattern": "^[1-9][0-9]*\\.(0|[1-9][0-9]*)$"
+            },
+            "related_entry_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 0,
+              "maxItems": 100
+            },
+            "directory_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "entry_id",
+            "version",
+            "title",
+            "primary_category",
+            "content_type",
+            "content_natures",
+            "sources",
+            "verification",
+            "created_date",
+            "updated_date",
+            "body"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "verification": {
+                    "const": "verified"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "verification_note"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "primary_category": {
+                    "const": "inbox"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "classification_reason"
+                ]
+              }
+            }
+          ],
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "IMA governed knowledge entry 1.1"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "policy.get"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "bindings.get"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "cloud.verify"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "index.lookup"
+            },
+            "entry_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "action",
+            "entry_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "entry.prepare"
+            },
+            "policy_version": {
+              "const": "1.1.0"
+            },
+            "request_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "entry": {
+              "$ref": "#/$defs/entry"
+            },
+            "directory_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "action",
+            "policy_version",
+            "request_id",
+            "entry"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "action": {
+              "const": "index.commit"
+            },
+            "policy_version": {
+              "const": "1.1.0"
+            },
+            "request_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "entry": {
+              "$ref": "#/$defs/entry"
+            },
+            "media_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "directory_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "action",
+            "policy_version",
+            "request_id",
+            "entry",
+            "media_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

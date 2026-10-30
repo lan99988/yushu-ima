@@ -1,0 +1,20 @@
+{
+  "request_id": "REPLACE_WITH_A_STABLE_UNIQUE_REQUEST_ID",
+  "policy_version": "2.0.0",
+  "mode": "organize",
+  "workspace": "isolated",
+  "object": {"key": "REPLACE_AFTER_SEARCHING_EXISTING_OBJECTS", "type": "concept"},
+  "expected_version": 0,
+  "material": {
+    "source_id": "REPLACE_WITH_STABLE_SOURCE_ID",
+    "locator": "替换成真实材料定位",
+    "kind": "original",
+    "content": "替换成完整原始材料"
+  },
+  "entry": {
+    "title": "替换为概念名称",
+    "primary_category": "learning",
+    "body": "替换成完整整理正文，保留出处、论证和适用边界。"
+  },
+  "execute": false
+}

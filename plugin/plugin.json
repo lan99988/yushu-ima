@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "yushu-ima",
+  "version": "2.6.1",
+  "description": "ima知识整理、检索、主卡归并与安全写入规则",
+  "author": {
+    "name": "Yushu ima contributors"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Yushu ima 知识助手",
+        "shortDescription": "检索、整理和归并ima知识卡",
+        "longDescription": "连接用户自己授权的ima知识服务，按主题维护完整主卡并保留来源、版本及恢复能力。",
+        "category": "Other",
+        "capabilities": []
+      },
+      "requires_local_executor": false
+    }
+  }
+}

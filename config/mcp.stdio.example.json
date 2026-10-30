@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "yushu-ima": {
+      "command": "python",
+      "args": [
+        "/ABSOLUTE/PATH/yushu-ima/agent/ima_agent.py",
+        "stdio"
+      ],
+      "env": {
+        "IMA_MCP_URL": "https://your-ima-server.example/bridge/v1/mcp",
+        "IMA_CLOUD_SERVICE_TOKEN": "REPLACE_LOCALLY",
+        "IMA_CLOUD_TIMEOUT": "120",
+        "IMA_CLOUD_BRIDGE_TOKEN": "REPLACE_LOCALLY"
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "entry": {
+    "entry_id": "12345678-1234-5678-9234-567812345678",
+    "version": "1.0",
+    "title": "证据与学习😀",
+    "primary_category": "learning",
+    "content_type": "concept",
+    "content_natures": [
+      "ai_synthesis",
+      "source_excerpt",
+      "ai_synthesis"
+    ],
+    "sources": [
+      {
+        "kind": "url",
+        "locator": "https://example.org/paper",
+        "author": "作者"
+      }
+    ],
+    "verification": "verified",
+    "verification_note": "已实际核查",
+    "created_date": "2026-10-24",
+    "updated_date": "2026-10-25",
+    "body": "正文\r\n第二行\r结尾",
+    "tags": [
+      "乙",
+      "甲",
+      "乙",
+      "😀",
+      ""
+    ]
+  },
+  "normalized": {
+    "entry_id": "12345678-1234-5678-9234-567812345678",
+    "version": "1.0",
+    "title": "证据与学习😀",
+    "primary_category": "learning",
+    "content_type": "concept",
+    "content_natures": [
+      "ai_synthesis",
+      "source_excerpt"
+    ],
+    "sources": [
+      {
+        "kind": "url",
+        "locator": "https://example.org/paper",
+        "author": "作者"
+      }
+    ],
+    "verification": "verified",
+    "verification_note": "已实际核查",
+    "created_date": "2026-10-24",
+    "updated_date": "2026-10-25",
+    "body": "正文\n第二行\n结尾\n",
+    "tags": [
+      "乙",
+      "甲",
+      "",
+      "😀"
+    ],
+    "life_goals": [],
+    "human_dimensions": [],
+    "aliases": []
+  },
+  "metadata": {
+    "entry_id": "12345678-1234-5678-9234-567812345678",
+    "version": "1.0",
+    "title": "证据与学习😀",
+    "primary_category": "learning",
+    "content_type": "concept",
+    "content_natures": [
+      "ai_synthesis",
+      "source_excerpt"
+    ],
+    "sources": [
+      {
+        "kind": "url",
+        "locator": "https://example.org/paper",
+        "author": "作者"
+      }
+    ],
+    "verification": "verified",
+    "verification_note": "已实际核查",
+    "created_date": "2026-10-24",
+    "updated_date": "2026-10-25",
+    "tags": [
+      "乙",
+      "甲",
+      "",
+      "😀"
+    ],
+    "life_goals": [],
+    "human_dimensions": [],
+    "aliases": [],
+    "policy_version": "1.0.0",
+    "body_sha256": "b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421"
+  },
+  "content": "# 证据与学习😀\n\n```json\n{\n  \"aliases\": [],\n  \"body_sha256\": \"b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421\",\n  \"content_natures\": [\n    \"ai_synthesis\",\n    \"source_excerpt\"\n  ],\n  \"content_type\": \"concept\",\n  \"created_date\": \"2026-10-24\",\n  \"entry_id\": \"12345678-1234-5678-9234-567812345678\",\n  \"human_dimensions\": [],\n  \"life_goals\": [],\n  \"policy_version\": \"1.0.0\",\n  \"primary_category\": \"learning\",\n  \"sources\": [\n    {\n      \"author\": \"作者\",\n      \"kind\": \"url\",\n      \"locator\": \"https://example.org/paper\"\n    }\n  ],\n  \"tags\": [\n    \"乙\",\n    \"甲\",\n    \"\",\n    \"😀\"\n  ],\n  \"title\": \"证据与学习😀\",\n  \"updated_date\": \"2026-10-25\",\n  \"verification\": \"verified\",\n  \"verification_note\": \"已实际核查\",\n  \"version\": \"1.0\"\n}\n```\n\n---\n\n正文\n第二行\n结尾\n",
+  "filename": "证据与学习😀__概念__v1.0.md",
+  "metadata_sha256": "4bbe5c54d69aac553c82bb5b8284d6f30103ad34a44cac60d3bc889e9976b5ae",
+  "content_sha256": "05f7b1de535438c4b5e73913bd0ab3b00cc344e88086a13c93a716868923b7ef",
+  "body_sha256": "b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421",
+  "uuid5": "47ba2e8c-eb2f-5c78-875e-57c0d2dc08c2"
+}
