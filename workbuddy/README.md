@@ -2,8 +2,10 @@
 
 这是给 **WorkBuddy** 用的 ima 知识助手，与 [`plugin/`](../plugin/) 并列存在。
 
+想先知道它能做什么，看[对外介绍](../docs/workbuddy-introduction.md)；已经装好、想少踩坑，看[实操经验](PLAYBOOK.md)。
+
 - `plugin/` 面向 ChatGPT / OpenAI 宿主，保留原有的网页插件与 OAuth 写法；
-- `workbuddy/` 面向 WorkBuddy，通过本地桥调用同一套云端服务。
+- `workbuddy/` 面向 WorkBuddy，通过 MCP 服务 `yushu-ima` 调用同一套云端服务。
 
 **两者互不覆盖，也不共享配置文件。** 用哪个就装哪个；同时安装不会互相干扰。规则内容同源（插件规则 2.10.0），差异只在宿主调用方式和运维步骤。
 

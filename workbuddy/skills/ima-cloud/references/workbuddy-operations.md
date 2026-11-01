@@ -2,19 +2,19 @@
 
 本文件把在 WorkBuddy 里跑通过的实操方法固定下来，供后续会话直接复用。规则本身仍以[主卡规则](topic-cards.md)、[知识2.0规范](knowledge-2.md)和[历史维护](legacy-operations.md)为准；这里只讲"怎么跑、跑到哪一步算完、出错在哪一层"。
 
-## 一、桥的生命周期
+## 一、连接方式
 
-WorkBuddy 通过本地桥（`local-server.mjs`，默认 `127.0.0.1:8787`）调用云端，MCP 服务名 `yushu-ima`。桥由 `mcp-launcher.mjs` 按需拉起，但**一次性脚本所在的 shell 结束时，它拉起的子进程会被回收**。
+WorkBuddy 通过 MCP 服务 `yushu-ima` 调用云端：标准安装用 `agent/ima_agent.py` 以 stdio 连接 `/bridge/v1/mcp`，只需要一个地址和两个令牌。在本机跑源码调试时才改用 HTTP 桥（`local-server.mjs`，默认 `127.0.0.1:8787`），由 `mcp-launcher.mjs` 按需拉起。
 
-因此单次脚本必须自带桥生命周期：先探测端口，未监听则 `spawn(local-server.mjs)`，跑完再杀。仓库根的 `probe-one.mjs`、`read-card.mjs`、`update-card.mjs`、`drain-delete.mjs` 都是这个结构，照抄即可。
+桥不是常驻服务：**一次性脚本所在的 shell 结束时，它拉起的子进程会被回收**。所以单次脚本必须自带生命周期：先探测端口，未监听则 `spawn(local-server.mjs)`，跑完再杀。仓库根的 `probe-one.mjs`、`read-card.mjs`、`update-card.mjs`、`drain-delete.mjs` 都是这个结构。
 
-判断桥是否在跑，看监听而不是看进程名：
+判断是否接通，看调用结果而不是进程名：
 
 ```text
 node probe-one.mjs ima_knowledge_policy '{}'
 ```
 
-返回策略即通；返回 `fetch failed` 说明桥没起，不是服务不可用。
+普通安装用 `python agent/ima_agent.py doctor` 验证；跑本机桥时用下面这条。返回策略即通，返回 `fetch failed` 说明桥没起，不是服务不可用。
 
 ## 二、写作与格式
 

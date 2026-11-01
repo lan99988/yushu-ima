@@ -183,7 +183,7 @@ Node.js 要求 22.13 或以上，服务测试使用 `node:sqlite`。示例 hosti
 | `examples/` | 只读查询和不执行写入的预览参数示例 |
 | `worker/` | 云端 MCP、HTTP 桥接、知识服务和原生维护实现 |
 | `tests/`、`tests_agent/` | 服务端和客户端离线测试 |
-| `docs/` | 配置、部署和原生连接说明 |
+| `docs/` | 配置、部署、原生连接与[对外介绍](docs/workbuddy-introduction.md) |
 
 ## 能力与限制
 

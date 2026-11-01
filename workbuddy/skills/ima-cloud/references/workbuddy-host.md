@@ -1,11 +1,11 @@
 # WorkBuddy 宿主适配
 
-本文件说明本技能在 WorkBuddy 中运行时的工具入口、工作区、能力门禁与本机运维，是同一套规则在本机的落地方式。规则文本本身与插件版一致，只有宿主相关表述不同：ChatGPT 网页宿主改为 WorkBuddy 会话，云端直连改为经本地桥调用。
+本文件说明本技能在 WorkBuddy 中运行时的工具入口、工作区、能力门禁与本机运维，是同一套规则在 WorkBuddy 中的落地方式。规则文本本身与插件版一致，只有宿主相关表述不同：ChatGPT 网页宿主改为 WorkBuddy 会话，云端直连改为经 MCP 服务调用。
 
 ## 工具入口
 
 - MCP 服务名 `yushu-ima`，工具在 WorkBuddy 内显示为 `mcp__yushu-ima__ima_*`，正文提到 `ima_knowledge_ingest`、`ima_knowledge_search` 等即指这些工具。
-- 传输：本机 HTTP 桥 `127.0.0.1:8787`。启动器 `mcp-launcher.mjs` 先探测端口，未监听则自动拉起 `local-server.mjs`，因此不需要用户手动开终端；桥加载的是 `dist/server/index.js` 构建产物。
+- 传输：MCP 服务 `yushu-ima`，由 `agent/ima_agent.py` 以 stdio 连接云端 `/bridge/v1/mcp`。在本机跑源码调试时才改用 HTTP 桥 `127.0.0.1:8787`：`mcp-launcher.mjs` 探测端口，未监听则拉起 `local-server.mjs`，但它加载的是 `dist/` 构建产物，需先 `npm run build`。
 - 桥不可用时先查 `ima_connection_status` 与 `ima_governance` 的 `service.health`，不要直接改技能规则或换号补发。
 
 ## 工作区
