@@ -29,106 +29,69 @@
 
 # 在 WorkBuddy 里使用
 
-这是给普通用户的最短路径：**不装 Node、不构建、不建数据库**，只要 Python 3.11 以上、两个文件、三个值。
+一条命令装完，你只需要向服务所有者要三个值。
 
-## 一、先确认你手上的三个值
+## 你需要什么
 
-向服务所有者索取下面三项。它们分别对应客户端要填的三个环境变量，缺一不可。
-
-| 配置项 | 是什么 | 长什么样 |
+| 值 | 对应变量 | 长什么样 |
 | --- | --- | --- |
-| `IMA_MCP_URL` | 服务的 MCP 入口地址 | `https://你的站点/bridge/v1/mcp` |
-| `IMA_CLOUD_SERVICE_TOKEN` | 外层网关令牌 | 一长串随机字符 |
-| `IMA_CLOUD_BRIDGE_TOKEN` | 内部桥令牌 | 另一串随机字符 |
+| 服务地址 | `IMA_MCP_URL` | `https://你的站点/bridge/v1/mcp` |
+| 网关令牌 | `IMA_CLOUD_SERVICE_TOKEN` | 一长串随机字符 |
+| 桥令牌 | `IMA_CLOUD_BRIDGE_TOKEN` | 另一串随机字符 |
 
-**知识库 ID 不需要你填。** 它绑定在服务端，由服务所有者初始化时写入；客户端只按服务返回的绑定工作，你换不换库也由服务端决定。
+知识库 ID 不用填，它绑定在服务端。
 
-> 服务所有者没给你令牌，说明这套服务不对外开放，需要自己按文末「自己部署云端服务」搭一套。
-
-## 二、拿到两个文件
-
-只需要仓库里的这两处，其他目录（`worker/`、`tests/`、`db/`）都是服务端和开发用的，不用管：
+## 装
 
 ```text
-yushu-ima/
-├── agent/ima_agent.py              # MCP stdio 接入器（纯 Python 标准库）
-└── workbuddy/skills/ima-cloud/     # 技能目录，含全部规则文件
+git clone https://github.com/lan99988/yushu-ima.git
+cd yushu-ima
+python scripts/install-workbuddy.py --url "https://你的站点/bridge/v1/mcp" --service-token "网关令牌" --bridge-token "桥令牌"
 ```
 
-## 三、装技能
+脚本做三件事：
 
-把技能目录整个复制到 WorkBuddy 的技能位置：
+1. 把技能复制到 `~/.workbuddy/skills/ima-cloud`；
+2. 把服务写进 `~/.workbuddy/mcp.json`，已有的其他服务保留，原文件备份为 `mcp.json.bak`；
+3. 用当前 Python 的绝对路径填好启动命令，省掉手改路径。
 
-```text
-mkdir -p ~/.workbuddy/skills
-cp -r workbuddy/skills/ima-cloud ~/.workbuddy/skills/ima-cloud
-```
+不装 Node、不构建、不建数据库。只要 Python 3.11 以上。
 
-Windows 上目标路径是 `C:\Users\<你的用户名>\.workbuddy\skills\ima-cloud`。
+## 验证
 
-复制完确认这一层有 `SKILL.md`，而不是 `ima-cloud/ima-cloud/`。
-
-## 四、登记 MCP 服务
-
-把下面的内容并入 `~/.workbuddy/mcp.json`（文件不存在就新建）。改三处：`args` 里的绝对路径、两个令牌、服务地址。
-
-```json
-{
-  "mcpServers": {
-    "yushu-ima": {
-      "command": "python",
-      "args": ["/ABSOLUTE/PATH/yushu-ima/agent/ima_agent.py", "stdio"],
-      "env": {
-        "IMA_MCP_URL": "https://YOUR_SITE/bridge/v1/mcp",
-        "IMA_CLOUD_SERVICE_TOKEN": "REPLACE_LOCALLY",
-        "IMA_CLOUD_BRIDGE_TOKEN": "REPLACE_LOCALLY",
-        "IMA_CLOUD_TIMEOUT": "120"
-      }
-    }
-  }
-}
-```
-
-`command` 用 `python` 还是绝对路径，取决于你的环境变量里有没有 python；Windows 上写 `python.exe` 的完整路径更稳。同一份模板也在 [`config/mcp.stdio.example.json`](config/mcp.stdio.example.json)。
-
-保存后重开一轮对话，在 WorkBuddy 的自定义连接器里信任 `yushu-ima`。
-
-## 五、验证
-
-在对话里说一句：
+重开一轮对话，在自定义连接器里信任 `yushu-ima`，然后说：
 
 > 查一下我的知识库里有哪些目录
 
-或者直接调只读工具：
+## 连不上
 
-```text
-python agent/ima_agent.py doctor
-```
-
-`doctor` 只做初始化、工具列表和知识政策读取，不会写入任何东西。返回工具清单和政策即接通；写入能力以 `ima_knowledge_policy` 当次返回为准，不要按版本号推断。
-
-## 六、连不上怎么查
-
-| 现象 | 多半是什么 |
+| 现象 | 多半是 |
 | --- | --- |
 | 连接器里看不到 `yushu-ima` | `mcp.json` 不是合法 JSON，或没重开对话 |
-| 报 401 / 未授权 | 两个令牌填反了。网关令牌给 `IMA_CLOUD_SERVICE_TOKEN`，桥令牌给 `IMA_CLOUD_BRIDGE_TOKEN` |
-| 报 `fetch failed` / 超时 | `IMA_MCP_URL` 写错，或服务端没起；先确认地址能在浏览器打开 |
-| 能查不能写 | 服务端没开对应门禁（写入、删除、归并各自独立），不是客户端问题 |
-| 提示目录为空 | 先确认服务端绑定的是你要的库；`formal` 是正式库，`isolated` 是验收库 |
+| 报 401 / 未授权 | 两个令牌填反了 |
+| 报 `fetch failed` | 服务地址写错，或服务端没起 |
+| 能查不能写 | 服务端没开对应门禁，不是客户端问题 |
 
-## 七、你的服务要对外开放时，服务端还要配这些
+## 不想跑脚本
 
-如果这套服务是你自己部署、打算分享给别人，除上面的令牌外还要在服务端秘密里配：
+手动三步：
+
+1. `cp -r workbuddy/skills/ima-cloud ~/.workbuddy/skills/`
+2. 把 [mcp.example.json](workbuddy/mcp.example.json) 并入 `~/.workbuddy/mcp.json`
+3. 改其中的绝对路径、服务地址和两个令牌
+
+## 服务端还要配什么
+
+如果这套服务是你自己部署、准备分享给别人，除上面两个令牌外还要在服务端秘密里配：
 
 | 服务端变量 | 用途 |
 | --- | --- |
 | `IMA_OPENAPI_CLIENTID` | ima 开放平台的应用 ID，账号指纹由它推出 |
 | `IMA_OPENAPI_APIKEY` | 对应的 API Key |
 | `IMA_SESSION_ENCRYPTION_KEY` | 32 字节随机数的 base64，原生会话用 AES-GCM 加密 |
-| 知识库 ID / 目录 ID | 在初始化 bindings 时写入，正式库与隔离库必须用不同的实际 ID |
+| 知识库 ID / 目录 ID | 初始化 bindings 时写入，正式库与隔离库必须用不同的实际 ID |
 
-完整步骤见 [`docs/configuration.md`](docs/configuration.md)。这两层别混：`/bridge/v1/*` 认桥令牌，`/mcp` 认平台所有者身份，桥令牌不等于所有者身份。
+完整步骤见 [`docs/configuration.md`](docs/configuration.md)。两层认证别混：`/bridge/v1/*` 认桥令牌，`/mcp` 认平台所有者身份，桥令牌不等于所有者身份。
 
 ---
 
@@ -227,7 +190,7 @@ Node.js 要求 22.13 或以上，服务测试使用 `node:sqlite`。示例 hosti
 - **改等同新建加删除。** ima 没有原位改写接口，所有修订都是先建新版本再删旧版本，文件 ID 会变、版本号递增（1.0 → 1.1 → 1.2）。系统按 `entry_id` 追踪，外部若硬编码 `media_id` 会失效。
 - **删除是两阶段。** 派发后要做全库缺席扫描，中途会看到 `verification_pending`，沿原请求号推进到 `succeeded` 并有四项校验才算完成。
 - **图片有独立门禁。** 上传成功不代表 ima 正文显示通过，需要 protected admin 的真实截图与重开证据。
-- **改服务端代码要重建。** 本地桥加载 `dist/`，改 `worker/*.js` 后必须 `npm run build`。
+- **改服务端代码要重建。** 本地运行的桥加载 `dist/` 构建产物，改 `worker/*.js` 后必须 `npm run build`，否则跑的还是旧代码。
 
 ## 配置与状态
 

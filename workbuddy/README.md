@@ -11,7 +11,7 @@
 
 | 项 | `plugin/`（OpenAI） | `workbuddy/`（本目录） |
 |---|---|---|
-| 调用方式 | 云端 `/mcp` 地址 + 所有者 OAuth | 本地桥 `mcp-launcher.mjs` → `127.0.0.1:8787` 的 MCP 服务 `yushu-ima` |
+| 调用方式 | 云端 `/mcp` 地址 + 所有者 OAuth | `agent/ima_agent.py stdio` 连 `/bridge/v1/mcp`；本机调试时才走 `127.0.0.1:8787` 的桥 |
 | 配置位置 | 插件自带的 `mcp.json` | `~/.workbuddy/mcp.json` |
 | 安装形态 | 插件包导入 | 技能目录复制 + MCP 服务登记 |
 | 额外规则 | — | [宿主适配](skills/ima-cloud/references/workbuddy-host.md)、[运维手册](skills/ima-cloud/references/workbuddy-operations.md) |
@@ -19,41 +19,17 @@
 
 ## 安装
 
-### 路线 A：用别人部署好的服务（普通用户）
+一条命令，需要三个值：服务地址、网关令牌、桥令牌（向服务所有者索取；**知识库 ID 绑定在服务端，不用填**）。
 
-只需要三个值，向服务所有者索取：`IMA_MCP_URL`（形如 `https://站点/bridge/v1/mcp`）、`IMA_CLOUD_SERVICE_TOKEN`、`IMA_CLOUD_BRIDGE_TOKEN`。**知识库 ID 不用填**，它绑定在服务端。
-
-1. 复制技能到 WorkBuddy 的技能目录：
-
-   ```text
-   cp -r workbuddy/skills/ima-cloud ~/.workbuddy/skills/ima-cloud
-   ```
-
-   仓库里的这份就是可运行版本，含全部引用文件，不需要再改写。
-
-2. 把 [mcp.example.json](mcp.example.json) 并入 `~/.workbuddy/mcp.json`，改三处：`args` 里的绝对路径、服务地址、两个令牌。
-
-3. 重开一轮对话，在 WorkBuddy 的自定义连接器里信任 `yushu-ima`。
-
-4. 用只读工具确认接通：`python agent/ima_agent.py doctor`。它只读政策与工具列表，不写任何东西。
-
-### 路线 B：自己本机开发（有完整仓库）
-
-在本机跑 `local-server.mjs` 桥时，MCP 配置改用启动器，由它按需拉起桥并接入 stdio：
-
-```json
-{
-  "mcpServers": {
-    "yushu-ima": {
-      "command": "node",
-      "args": ["/ABSOLUTE/PATH/yushu-ima/mcp-launcher.mjs"],
-      "env": {"IMA_PYTHON": "/ABSOLUTE/PATH/to/python", "IMA_BRIDGE_PORT": "8787"}
-    }
-  }
-}
+```text
+python scripts/install-workbuddy.py --url "https://你的站点/bridge/v1/mcp" --service-token "网关令牌" --bridge-token "桥令牌"
 ```
 
-桥令牌读仓库根的 `.dev.vars`，不走 `mcp.json`。改 `worker/*.js` 后必须 `npm run build`，否则桥仍加载旧的 `dist/`。
+脚本会复制技能到 `~/.workbuddy/skills/ima-cloud`、把服务写进 `~/.workbuddy/mcp.json`（保留其他服务并备份原文件）、用当前 Python 的绝对路径填好启动命令。重开对话后在自定义连接器里信任 `yushu-ima` 即可。
+
+手动配置与故障排查见根目录 [README](../README.md#在-workbuddy-里使用)。
+
+> 本目录只有技能规则与 MCP 示例，不含本地桥实现。要在本机跑桥调试，需要完整仓库、`npm ci` 与 `npm run build`，再用 `mcp-launcher.mjs` 作为入口；普通用户不需要这一步。
 
 ## 能力边界
 
