@@ -1,13 +1,16 @@
 {
   "mcpServers": {
     "yushu-ima": {
-      "command": "node",
+      "command": "python",
       "args": [
-        "/ABSOLUTE/PATH/yushu-ima/mcp-launcher.mjs"
+        "/ABSOLUTE/PATH/yushu-ima/agent/ima_agent.py",
+        "stdio"
       ],
       "env": {
-        "IMA_PYTHON": "/ABSOLUTE/PATH/to/python",
-        "IMA_BRIDGE_PORT": "8787"
+        "IMA_MCP_URL": "https://YOUR_AUTHORIZED_SITE/bridge/v1/mcp",
+        "IMA_CLOUD_SERVICE_TOKEN": "REPLACE_LOCALLY",
+        "IMA_CLOUD_BRIDGE_TOKEN": "REPLACE_LOCALLY",
+        "IMA_CLOUD_TIMEOUT": "120"
       }
     }
   }

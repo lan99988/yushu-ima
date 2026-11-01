@@ -19,9 +19,11 @@
 
 ## 安装
 
-1. **部署云端服务**（若尚未部署）：按根目录 [README](../README.md) 的方式四准备自己的 Worker、D1、R2 与令牌，并在 `.dev.vars` 中写入桥令牌。
+### 路线 A：用别人部署好的服务（普通用户）
 
-2. **复制技能**到 WorkBuddy 的技能目录：
+只需要三个值，向服务所有者索取：`IMA_MCP_URL`（形如 `https://站点/bridge/v1/mcp`）、`IMA_CLOUD_SERVICE_TOKEN`、`IMA_CLOUD_BRIDGE_TOKEN`。**知识库 ID 不用填**，它绑定在服务端。
+
+1. 复制技能到 WorkBuddy 的技能目录：
 
    ```text
    cp -r workbuddy/skills/ima-cloud ~/.workbuddy/skills/ima-cloud
@@ -29,9 +31,29 @@
 
    仓库里的这份就是可运行版本，含全部引用文件，不需要再改写。
 
-3. **登记 MCP 服务**：把 [mcp.example.json](mcp.example.json) 的内容并入 `~/.workbuddy/mcp.json`，把 `command`、`args` 里的绝对路径改成你自己的，`IMA_PYTHON` 指向本机 Python。
+2. 把 [mcp.example.json](mcp.example.json) 并入 `~/.workbuddy/mcp.json`，改三处：`args` 里的绝对路径、服务地址、两个令牌。
 
-4. **在 WorkBuddy 里信任该服务**：自定义连接器入口出现新服务后点“信任”，之后即可在对话里直接调用。
+3. 重开一轮对话，在 WorkBuddy 的自定义连接器里信任 `yushu-ima`。
+
+4. 用只读工具确认接通：`python agent/ima_agent.py doctor`。它只读政策与工具列表，不写任何东西。
+
+### 路线 B：自己本机开发（有完整仓库）
+
+在本机跑 `local-server.mjs` 桥时，MCP 配置改用启动器，由它按需拉起桥并接入 stdio：
+
+```json
+{
+  "mcpServers": {
+    "yushu-ima": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/yushu-ima/mcp-launcher.mjs"],
+      "env": {"IMA_PYTHON": "/ABSOLUTE/PATH/to/python", "IMA_BRIDGE_PORT": "8787"}
+    }
+  }
+}
+```
+
+桥令牌读仓库根的 `.dev.vars`，不走 `mcp.json`。改 `worker/*.js` 后必须 `npm run build`，否则桥仍加载旧的 `dist/`。
 
 ## 能力边界
 
