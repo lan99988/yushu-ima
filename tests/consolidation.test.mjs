@@ -71,6 +71,7 @@ test('happy merge verifies backups and new readback, migrates backlinks and pres
  const {c,q,objects}=await fixture();
  const child=draft('child','child');child.object.parent_key='key0';child.object.relations=[{target_key:'key0',relation:'关联',reason:'完整原因'}];await knowledgeAction(child,c);
  const p=await knowledgeAction(q,c),r=await knowledgeAction(execute(q,p),c);assert.equal(r.status,'succeeded',JSON.stringify(r));assert.equal(c.deletes,2);assert.equal(r.object.entry_id,objects[1].entry_id);assert.equal(r.object.materials.length,3);
+ const merged=c.remote.get(r.object.media_id);assert.ok(merged.startsWith('# '),merged.slice(0,40));assert.ok(!merged.includes('```json')&&!merged.includes('\n---\n'),'merge output must not embed metadata');
  assert.ok(r.object.aliases.includes('别名source0'));assert.ok(r.object.tags.includes('source0'));assert.ok(r.object.history.some(h=>h.object_key==='key0'));
  const old=await knowledgeAction({action:'object.get',object_key:'key0'},c);assert.equal(old.object.object_key,'key1');assert.equal(old.resolved_from,'key0');assert.equal((await c.store.get('knowledge_objects','key0')).merged_into,'key1');
  const incoming=(await knowledgeAction({action:'object.get',object_key:'child'},c)).object;assert.equal(incoming.parent_key,'key1');assert.equal(incoming.relations[0].target_key,'key1');

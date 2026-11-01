@@ -7,28 +7,40 @@ import {scopedStore} from './admin.js';
 const root=ctx=>ctx.baseStore||ctx.store,key=(kb_id,media_id)=>stable({kb_id,media_id});
 const need=(ok,message,status='blocked')=>{if(!ok)throw Object.assign(Error(message),{status});};
 const now=()=>new Date().toISOString();
+const HEADING=/^(\uFEFF?# [^\n]+\n\n)/u;
+const normalizeText=content=>content.replaceAll('\r\n','\n').replaceAll('\r','\n');
+const headingText=heading=>heading.replace(/^\uFEFF?/u,'').trim();
 function envelope(content){
- const normalized=content.replaceAll('\r\n','\n').replaceAll('\r','\n');
+ const normalized=normalizeText(content);
  const head=normalized.match(/^(\uFEFF?# [^\n]+\n\n)```json\n([\s\S]*?)\n```\n\n---\n\n([\s\S]*)$/u);
  const tail=head?null:normalized.match(/^(\uFEFF?# [^\n]+\n\n)([\s\S]*?)\n---\n\n```json\n([\s\S]*?)\n```\n?$/u);
  if(!head&&!tail){need(!/^\uFEFF?(?:# [^\n]+\n\n```json|---\n)/u.test(normalized)&&!/(?:^|\n)---\n\n```json\n/u.test(normalized),'ima_replacement_ambiguous_metadata','invalid_input');return null;}
  let metadata;try{metadata=JSON.parse(head?head[2]:tail[3]);}catch{need(false,'ima_replacement_invalid_metadata_json','invalid_input');}
  need(metadata&&typeof metadata==='object'&&!Array.isArray(metadata),'ima_replacement_metadata_object_required','invalid_input');return {heading:(head||tail)[1],metadata,body:head?head[3]:tail[2],layout:head?'head':'tail'};
 }
-export async function revisionArtifact(original,supplied,filename,date){
- const prior=envelope(original),candidate=envelope(supplied);let content=supplied,newVersion=null;
- if(prior){
-  need(typeof prior.metadata.entry_id==='string'&&/^[1-9]\d*\.(?:0|[1-9]\d*)$/u.test(prior.metadata.version||''),'ima_replacement_governed_identity_required','invalid_input');
-  if(candidate)for(const field of ['entry_id','title','primary_category','content_type','sources'])need(stable(candidate.metadata[field])===stable(prior.metadata[field]),'ima_replacement_metadata_identity_or_sources_changed','conflict');
-  let body=candidate?candidate.body:supplied;body=body.replaceAll('\r\n','\n').replaceAll('\r','\n');if(!body.endsWith('\n'))body+='\n';need(body.trim().length>0,'ima_replacement_body_required','invalid_input');need(body!==prior.body||prior.layout==='head','ima_replacement_no_content_change','invalid_input');
-  const [major,minor]=prior.metadata.version.split('.');newVersion=major+'.'+(BigInt(minor)+1n);need(newVersion.length<=20,'ima_replacement_version_limit','invalid_input');
-  const metadata={...prior.metadata,previous_version:prior.metadata.version,version:newVersion,body_sha256:await sha256(body),updated_date:date,verification:'pending',verification_note:'正文已按用户请求修订，待重新核查；历史审核证据保留。'};
-  content=prior.heading+body+'\n---\n\n```json\n'+JSON.stringify(metadata,null,2)+'\n```\n';
+// 新格式只保留标题和正文，身份与版本来自治理索引；旧文件的头部/尾部 JSON 仍可读，
+// 以便历史卡片继续按原有版本递增规则修订。
+function plain(content){const normalized=normalizeText(content),m=HEADING.exec(normalized);return m?{heading:m[1],body:normalized.slice(m[1].length),layout:'plain'}:null;}
+export async function revisionArtifact(original,supplied,filename,date,governedMetadata){
+ const legacy=envelope(original),current=legacy||plain(original),candidate=envelope(supplied);
+ const metadata=governedMetadata||legacy?.metadata;let content=supplied,newVersion=null,priorVersion=null,bodySha256=null;
+ if(metadata){
+  need(current,'ima_replacement_original_layout_unknown','invalid_input');
+  if(legacy&&governedMetadata)need(legacy.metadata.entry_id===governedMetadata.entry_id,'ima_replacement_index_identity_mismatch','conflict');
+  need(typeof metadata.entry_id==='string'&&/^[1-9]\d*\.(?:0|[1-9]\d*)$/u.test(metadata.version||''),'ima_replacement_governed_identity_required','invalid_input');
+  if(candidate)for(const field of ['entry_id','title','primary_category','content_type','sources'])need(stable(candidate.metadata[field])===stable(metadata[field]),'ima_replacement_metadata_identity_or_sources_changed','conflict');
+  let body=candidate?candidate.body:supplied;
+  if(!candidate){const document=plain(supplied);if(document){need(headingText(document.heading)===headingText(current.heading),'ima_replacement_title_heading_changed','invalid_input');body=document.body;}}
+  body=normalizeText(body);if(!body.endsWith('\n'))body+='\n';need(body.trim().length>0,'ima_replacement_body_required','invalid_input');need(body!==current.body||current.layout==='head','ima_replacement_no_content_change','invalid_input');
+  priorVersion=metadata.version;const [major,minor]=priorVersion.split('.');newVersion=major+'.'+(BigInt(minor)+1n);need(newVersion.length<=20,'ima_replacement_version_limit','invalid_input');
+  bodySha256=await sha256(body);
+  content=current.heading+body;
  }else need(!candidate,'ima_replacement_unexpected_metadata_header','invalid_input');
  need(content!==original,'ima_replacement_no_content_change','invalid_input');
  const digest=await sha256(content),ext=filename.match(/\.(md|markdown|txt)$/iu)?.[0];need(ext,'ima_replacement_text_filename_required','invalid_input');
- const stem=filename.slice(0,-ext.length),name=newVersion&&stem.endsWith('__v'+prior.metadata.version)?stem.slice(0,-prior.metadata.version.length)+newVersion+ext:stem+'__修订_'+digest.slice(0,10)+ext;
- need(new TextEncoder().encode(name).length<=255,'ima_replacement_filename_limit','invalid_input');return {content,filename:name,sha256:digest,...(newVersion?{version:newVersion}:{})};
+ const stem=filename.slice(0,-ext.length),base=stem.replace(/(?:__修订_[0-9a-f]{6,}|__v\d+\.\d+)+$/u,'');
+ const name=newVersion?(stem.endsWith('__v'+priorVersion)?stem.slice(0,-priorVersion.length)+newVersion+ext:base+'__v'+newVersion+ext):stem+'__修订_'+digest.slice(0,10)+ext;
+ need(new TextEncoder().encode(name).length<=255,'ima_replacement_filename_limit','invalid_input');return {content,filename:name,sha256:digest,...(newVersion?{version:newVersion,body_sha256:bodySha256}:{})};
 }
 export async function registerReplacement(ctx,e,op,content){
  const identity=await sha256(stable({account:e.account,kb_id:e.b.kb_id,workspace:ctx.workspace,request_id:op.request_id}));
@@ -65,7 +77,12 @@ async function newCard(ctx,e,row){
 export async function replacementForDelete(ctx,e,request_id,snapshot){
  const link=await ctx.store.get('replacement_deletes',request_id);if(!link)return null;
  const row=await ctx.store.get('replacements',link.replacement_request_id);bound(row,e);const {replacement,...actual}=snapshot;
- need(stable(actual)===stable(row.source),'ima_replacement_old_card_changed','conflict');if(ctx.workspace!=='isolated')need(await replacementProof(ctx,e),'ima_replacement_isolated_acceptance_required');
+ if(stable(actual)!==stable(row.source)){
+  // 原生侧的 md5_sum 由服务端异步索引回填，空值变成实值是正常的延迟，不构成身份变化。
+  const drift=Object.keys({...actual,...row.source}).filter(k=>stable(actual[k])!==stable(row.source[k]));
+  const onlyMd5Fill=drift.length===1&&drift[0]==='md5_sum'&&!row.source.md5_sum;
+  if(!onlyMd5Fill)throw Object.assign(Error('ima_replacement_old_card_changed:'+drift.join(',')),{status:'conflict'});
+ }if(ctx.workspace!=='isolated')need(await replacementProof(ctx,e),'ima_replacement_isolated_acceptance_required');
  return {request_id:row.request_id,...await newCard(ctx,e,row),original_media_id:row.source.media_id};
 }
 async function validateReplacement(ctx,e,deletion,row,result){

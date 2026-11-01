@@ -89,8 +89,8 @@ async function fixture(){
  await ctx.baseStore.put('settings','bindings',{...b,kb_id:'formal-kb'});await ctx.baseStore.put('settings','service',{ready:true,publication_enabled:true});await ctx.store.put('settings','service',{publication_enabled:true});
  await sessionAction('install',{installation_id:'delete-fixture-login-0001',account_info:{userId:'delete-user',token:'access',refreshToken:'refresh',tokenExpiredTime:Date.now()+7200000,refreshTokenExpiredTime:Date.now()+86400000}},ctx);
  ctx.sessionFetcher=async()=>Response.json({code:0,token:'renewed',token_valid_time:7200});await sessionAction('verify',{},ctx);
- const nativeId='7000000000000002',folder=b.categories.learning.folder_id,media_id='file-'+nativeId,contents=new Map([[media_id,'# 隔离删除测试\n\n原始正文。\n']]);let deleted=false,dispatches=0,mode='success',title='sample.md',media_type=7;
- const item=()=>({media_id,title,media_type,parent_folder_id:folder,file_size:String(new TextEncoder().encode(contents.get(media_id)).length),md5_sum:'original-md5'});
+ const nativeId='7000000000000002',folder=b.categories.learning.folder_id,media_id='file-'+nativeId,contents=new Map([[media_id,'# 隔离删除测试\n\n原始正文。\n']]);let deleted=false,dispatches=0,mode='success',title='sample.md',media_type=7,md5='original-md5';
+ const item=()=>({media_id,title,media_type,parent_folder_id:folder,file_size:String(new TextEncoder().encode(contents.get(media_id)).length),md5_sum:md5});
  const roots=Object.values(b.categories).map(x=>({media_id:x.folder_id,title:x.folder_name,media_type:99,parent_folder_id:nativeId,file_size:'0',md5_sum:''}));
  const list=id=>id?(id===folder&&!deleted?[item()]:[]):roots;
  ctx.nativeFetcher=async(url,options)=>{
@@ -116,7 +116,7 @@ async function fixture(){
  assert.equal((await moveAction('ima_bind_move_workspace',{native_knowledge_base_id:nativeId},ctx)).status,'succeeded');
  const preview=(request_id='delete-1')=>api.contentAction('ima_delete_preview',{request_id,media_id,folder_id:folder},ctx);
  const execute=p=>api.contentAction('ima_delete_execute',{request_id:p.request_id,preview_hash:p.preview_hash},ctx);
- return {env,ctx,b,media_id,folder,contents,preview,execute,dispatches:()=>dispatches,setMode:x=>mode=x,isDeleted:()=>deleted,externallyDelete:()=>deleted=true,setFileType:(name,type)=>{title=name;media_type=type;}};
+ return {env,ctx,b,media_id,folder,contents,preview,execute,dispatches:()=>dispatches,setMode:x=>mode=x,isDeleted:()=>deleted,externallyDelete:()=>deleted=true,setFileType:(name,type)=>{title=name;media_type=type;},setMd5:x=>{md5=x;}};
 }
 
 test('knowledge deletion exposes a destructive execute separate from preview and index-updating reconcile',()=>{
@@ -211,4 +211,10 @@ test('administrative close and migration freeze cannot cross an in-flight native
   const admin={...f.ctx,workspace:'formal',store:f.ctx.baseStore};
   f.ctx.nativeFetcher=async(url,options)=>{if(url.endsWith('/del_knowledge')){await assert.rejects(()=>adminAction(action,admin),error=>error.status==='conflict');observed=true;}return fetcher(url,options);};
   assert.equal((await f.execute(p)).status,'succeeded');assert.equal(observed,true);assert.equal((await adminAction(action,admin)).status,'succeeded');assert.equal(f.dispatches(),1);f.env.close();}
+});
+
+test('an asynchronously filled md5 does not stale an undispatched delete preview',async()=>{
+ const f=await fixture();f.setMd5('');const p=await f.preview('delete-md5-fill');assert.equal(p.status,'preview',JSON.stringify(p));
+ f.setMd5('filled-after-preview');
+ const r=await f.execute(p);assert.equal(r.status,'succeeded',JSON.stringify(r));assert.equal(f.isDeleted(),true);assert.equal(f.dispatches(),1);f.env.close();
 });

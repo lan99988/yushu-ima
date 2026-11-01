@@ -29,6 +29,14 @@ export async function knowledgeTransportAllowed(ctx,domain,q){
  const saved=await root(ctx).get('operations',q.request_id);
  // A pre-upgrade durable transaction is recovered by its original identity.
  if(saved&&saved.created_at&&saved.created_at<service.knowledge_v2_activated_at)return true;
+ // 先增后删修订的 create 走 replacements 登记表授权；随后的 authorizeReplacementCreate
+ // 会复核候选哈希、绑定与同目录重名，因此这里放行不等于绕过内容门禁。
+ if(domain==='kb'&&q.action==='text.create'&&q.request_id){
+  for(const workspace of ['formal','isolated']){
+   const store=workspace===ctx.workspace?ctx.store:(await import('./admin.js')).scopedStore(root(ctx),workspace);
+   if(await store.get('replacement_creates',q.request_id))return true;
+  }
+ }
  for(const workspace of ['formal','isolated']){
   const store=workspace===ctx.workspace?ctx.store:(await import('./admin.js')).scopedStore(root(ctx),workspace);
   const permit=await store.get('knowledge_transports',q.request_id);
@@ -110,9 +118,27 @@ async function prepare(q,ctx,internal={}){
  return {bytes,original,entry,object,old,adopted,imageWrites:illustration.writes,policy_version:p.policy_version};
 }
 
+// 这些状态表示"确定没有写入"：保留对象的 pending 标记会让该对象永久无法再提交，
+// 治理预留也会把该版本号永久占住，后续合法重试会一直 conflict。
+const NOT_WRITTEN=new Set(['conflict','blocked','invalid_input']);
+async function releasePending(ctx,op){
+ if(op.governance?.request_id){
+  const {releaseReservationForRequest}=await import('./governance.js');
+  await releaseReservationForRequest(ctx,op.governance.request_id);
+ }
+ if(!op.object)return;
+ const saved=await ctx.store.get('knowledge_objects',op.object.object_key);
+ if(saved?.pending_request!==op.request_id)return;
+ const {pending_request,...rest}=saved;
+ await ctx.store.put('knowledge_objects',op.object.object_key,rest);
+}
 async function complete(ctx,op,receipt){
  op.receipt=receipt;const media_id=receipt?.resource?.media_ids?.[0]||(!op.object?receipt?.resource?.note_id:undefined);
- if(receipt?.status!=='succeeded'||!media_id){op.status=receipt?.status==='unknown'?'unknown':'verification_pending';await ctx.store.put('knowledge_operations',op.request_id,op);return view(op);}
+ if(receipt?.status!=='succeeded'||!media_id){
+  const notWritten=NOT_WRITTEN.has(receipt?.status);
+  if(notWritten)await releasePending(ctx,op);
+  op.status=notWritten?'failed':receipt?.status==='unknown'?'unknown':'verification_pending';
+  await ctx.store.put('knowledge_operations',op.request_id,op);return view(op);}
  if(op.object?.images?.length){
   const proof=await root(ctx).get('settings','knowledge_image_acceptance');
   if(!imageDisplayVerified(proof,op.object,(await settings(ctx)).b.account_sha256)){op.status='verification_pending';op.message='ima_inline_image_display_and_reopen_acceptance_required';await ctx.store.put('knowledge_operations',op.request_id,op);return view(op);}

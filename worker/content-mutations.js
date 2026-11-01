@@ -35,6 +35,12 @@ const deleteResource=kb_id=>stable({domain:'knowledge',note_id:'ima-kb:'+kb_id},
 function exactDeleteOwner(owner,request_id){
  const prefix='native-delete:'+request_id+':';return typeof owner==='string'&&owner.startsWith(prefix)&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(owner.slice(prefix.length));
 }
+// 原生列表的 md5_sum 由服务端异步回填，空值变成实值只是索引延迟，不构成目标卡片被改动。
+function samePreview(fresh,stored){
+ if(stable(fresh)===stable(stored))return true;
+ const drift=Object.keys({...fresh,...stored}).filter(k=>stable(fresh[k])!==stable(stored[k]));
+ return drift.length===1&&drift[0]==='md5_sum'&&!stored.md5_sum;
+}
 const undispatchedPreview=op=>op.status==='preview'&&!op.dispatched_at&&!op.dispatch_owner&&!op.provider_result;
 export async function nativeDeleteLockBinding(ctx,op){
  if(!op?.snapshot?.kb_id)return null;
@@ -77,7 +83,7 @@ async function preview(name,q,ctx,e){
   const op={request_id:q.request_id,operation,fingerprint,native_user_sha256:e.native_user_sha256,status:'preview',created_at:now(),snapshot:value,execution_enabled:operation==='delete'&&(ctx.workspace==='isolated'||await deletionProof(ctx,e))};
   if(operation==='edit'){
    const date=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-   const revision=await revisionArtifact(source.content,q.new_content,value.title,date),bytes=new TextEncoder().encode(revision.content);need(bytes.length>0&&bytes.length<=1048576,'ima_content_candidate_too_large','invalid_input');
+   const revision=await revisionArtifact(source.content,q.new_content,value.title,date,await governedMetadata(ctx,q.media_id)),bytes=new TextEncoder().encode(revision.content);need(bytes.length>0&&bytes.length<=1048576,'ima_content_candidate_too_large','invalid_input');
    const key='content-candidates/'+(ctx.workspace||'formal')+'/'+e.account+'/'+await sha256(q.request_id)+'.md';
    await ctx.blobs.put(key,bytes,{contentType:'text/markdown; charset=utf-8'});const saved=await ctx.blobs.get(key);need(saved&&await sha256(new Uint8Array(await saved.arrayBuffer()))===await sha256(bytes),'ima_content_candidate_persistence_failed','verification_pending');
    op.snapshot={...value,candidate:{sha256:await sha256(bytes),size:bytes.length,blob_key:key,filename:revision.filename,...(revision.version?{version:revision.version}:{})}};
@@ -88,6 +94,16 @@ async function preview(name,q,ctx,e){
   await ctx.store.put('content_operations',q.request_id,op);
   return {...view(op),...(operation==='edit'?{original_content:source.content,proposed_content:op.replacement_plan.create_arguments.content}:{}),deletion_scope:operation==='delete'?'remove_from_knowledge_base':undefined};
  });
+}
+// 新格式文件不再自带 JSON 元数据，修订所需的 entry_id/版本/来源改由治理索引提供。
+async function governedMetadata(ctx,media_id){
+ for(const collection of ['governance_index','cards'])for(const {value} of await collectionRows(ctx,collection)){
+  if(value.media_id!==media_id&&value.current_content?.media_id!==media_id)continue;
+  const metadata=value.metadata;if(!metadata?.entry_id)continue;
+  const version=value.current_content?.version;
+  return version&&version!==metadata.version?{...metadata,version}:metadata;
+ }
+ return null;
 }
 async function backup(ctx,e,op,source){
  const key='content-backups/'+(ctx.workspace||'formal')+'/'+e.account+'/'+await sha256(op.request_id)+'/original.md';
@@ -132,7 +148,9 @@ async function scanFence(ctx,e,op){
 }
 function compareListing(e,id,native,api){
  need(native.knowledge_base_id===e.binding.native_knowledge_base_id&&native.path?.at(-1)?.folder_id===(id||e.binding.native_knowledge_base_id),'ima_content_scan_path_mismatch','verification_pending');
- need(api.status==='succeeded'&&api.data?.has_more===false&&Array.isArray(api.data.items),'ima_content_library_scan_incomplete','verification_pending');
+ need(api.status==='succeeded','ima_content_library_scan_incomplete:status='+api.status,'verification_pending');
+ need(api.data?.has_more===false,'ima_content_library_scan_incomplete:has_more='+api.data?.has_more,'verification_pending');
+ need(Array.isArray(api.data.items),'ima_content_library_scan_incomplete:items='+typeof api.data?.items,'verification_pending');
  const shape=items=>items.map(x=>({media_id:x.media_id,title:x.title,kind:x.kind})).sort((a,b)=>a.media_id.localeCompare(b.media_id));
  need(stable(shape(native.items))===stable(shape(api.data.items)),'ima_content_native_openapi_scan_mismatch','verification_pending');
 }
@@ -220,11 +238,11 @@ async function run(q,ctx,e,reconcile){
   if(op.status==='preview'){
    if(reconcile)return view(op);
    const reservation=await reserveDeleteOwner(ctx,e,op);await preflight(ctx,e,{...reservation,request_id:op.request_id});if(ctx.workspace!=='isolated')need(await deletionProof(ctx,e),'ima_content_isolated_delete_acceptance_required');
-   const fresh=await snapshot(ctx,e,{...op.snapshot,request_id:op.request_id});need(stable(fresh.value)===stable(op.snapshot),'ima_content_preview_stale','conflict');
+   const fresh=await snapshot(ctx,e,{...op.snapshot,request_id:op.request_id});need(samePreview(fresh.value,op.snapshot),'ima_content_preview_stale','conflict');
    const resource=reservation.resource_key,owner=reservation.owner;
    need(await root(ctx).acquireLock(resource,owner),'ima_content_library_write_in_progress','conflict');let prepared=false;
    try{
-    const check=await snapshot(ctx,e,{...op.snapshot,request_id:op.request_id});need(stable(check.value)===stable(op.snapshot),'ima_content_preview_stale','conflict');
+    const check=await snapshot(ctx,e,{...op.snapshot,request_id:op.request_id});need(samePreview(check.value,op.snapshot),'ima_content_preview_stale','conflict');
     op.backup=await backup(ctx,e,op,check.source);
     await withServiceControls(ctx,async controlled=>{
      await writeGates(ctx,e);

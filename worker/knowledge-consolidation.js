@@ -1,5 +1,5 @@
 import {sha256,stable,withShortLease} from './storage.js';
-import {settings,governance,normalize,packed} from './governance.js';
+import {settings,governance,normalize} from './governance.js';
 import {readTextOriginal} from './native-content.js';
 import {contentAction,nativeDeleteLockBinding} from './content-mutations.js';
 import {collectionRows,withMovePublicationLease,resolveCurrentContent} from './move-index.js';
@@ -94,8 +94,9 @@ async function preview(q,ctx,api,hash){
  const candidate=await api.prepare(child,ctx,{old:merged});
  need(candidate.object.aliases.length<=20&&candidate.object.tags.length<=20,'consolidation_metadata_limit');
  const {p,b}=await settings(ctx);
- const normalized=normalize(candidate.entry,p),{body,...metadata}=normalized;
- const rendered='# '+normalized.title+'\n\n```json\n'+packed({...metadata,policy_version:p.policy_version,body_sha256:await sha256(body)},2)+'\n```\n\n---\n\n'+body;
+ const normalized=normalize(candidate.entry,p),{body}=normalized;
+ // 元数据只留在治理索引与服务端；正文仅标题和内容，读者在 ima 里不看到内部 JSON。
+ const rendered='# '+normalized.title+'\n\n'+body;
  need(new TextEncoder().encode(rendered).length<=1048576,'consolidation_rendered_text_exceeds_native_deletion_limit');
  const op={request_id:q.request_id,hash,status:'preview',phase:'preview',master_key:master.object_key,sources,objects,requires_confirmation,child,candidate:{...candidate,bytes:Array.from(candidate.bytes),imageWrites:(candidate.imageWrites||[]).map(x=>({...x,bytes:Array.from(x.bytes)}))},graph,graph_before:rows,settings_hash:await sha256(stable({p,b})),deletions:[],created_at:new Date().toISOString()};
  op.preview_hash=await sha256(stable({...op,created_at:undefined}));await persist(ctx,op);return view(op);

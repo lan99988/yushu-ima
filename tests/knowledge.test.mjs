@@ -7,8 +7,8 @@ let implementation;try{implementation=await import('../worker/knowledge.js');}ca
 const run=async(q,c)=>{assert.equal(typeof implementation?.knowledgeAction,'function','unified knowledge engine must exist');return implementation.knowledgeAction(q,c);};
 const request=(request_id='new')=>({action:'ingest',request_id,policy_version:'2.0.0',mode:'organize',object:{key:'learning/retrieval',type:'concept'},material:{source_id:request_id,locator:'正文',content:'原始材料 '+request_id,kind:'opinion',author:'作者',context:'信息学习'},entry:{title:'检索练习',primary_category:'learning',body:'检索练习通过主动回想促进学习。\n\n保留原材料中的完整例子与适用条件。',tags:['学习','认知']},expected_version:0,execute:true});
 
-test('new unified organize uses the exact simple display filename with version in metadata',async()=>{
- const c=context(),q=request('simple-title');q.entry.title='鱼油';const r=await run(q,c);assert.equal(r.status,'succeeded',JSON.stringify(r));assert.equal(c.transport.filename,'鱼油.md');assert.equal(r.object.filename,'鱼油.md');assert.match(c.transport.content,/"version": "1.0"/);
+test('new unified organize uses the exact simple display filename and keeps version out of the file',async()=>{
+ const c=context(),q=request('simple-title');q.entry.title='鱼油';const r=await run(q,c);assert.equal(r.status,'succeeded',JSON.stringify(r));assert.equal(c.transport.filename,'鱼油.md');assert.equal(r.object.filename,'鱼油.md');assert.ok(c.transport.content.startsWith('# 鱼油\n\n'));assert.ok(!c.transport.content.includes('```json'));
 });
 test('legacy unknown ingest reconciles its original versioned filename and receipt without redispatch',async()=>{
  const c=context(),q=request('old-unknown'),p=await run({...q,execute:false},c),{governance}=await import('../worker/governance.js'),{sha256,stable}=await import('../worker/storage.js');
@@ -108,4 +108,16 @@ test('legacy note creation uses the unified archive without changing the native 
 test('a completed durable receipt can be read while a terminated worker lease is still present',async()=>{
  const c=context(),q=request();await run(q,c);c.store.acquireLease=async()=>null;
  const r=await run({...q,reconcile:true},c);assert.equal(r.status,'succeeded');assert.equal(r.replayed,true);
+});
+
+test('a definitely-unwritten conflict releases the object instead of locking it forever',async()=>{
+ const c=context(),first=await run(request(),c);assert.equal(first.status,'succeeded',JSON.stringify(first));
+ const invoke=c.invoke;
+ c.invoke=async(d,q)=>q.action==='text.create'&&!q.reconcile?{status:'conflict',message:'同名文件已存在'}:invoke(d,q);
+ const blocked=request('conflict-update');blocked.expected_version=1;blocked.material={...blocked.material,source_id:'conflict-update',content:'新增材料'};blocked.entry.body+='\n\n新增段落。';
+ const failed=await run(blocked,c);assert.equal(failed.status,'failed',JSON.stringify(failed));
+ const saved=await c.store.get('knowledge_objects',first.object.object_key);assert.equal(saved.pending_request,undefined);assert.equal(saved.revision,1);
+ c.invoke=invoke;
+ const retry=request('retry-update');retry.expected_version=1;retry.material={...retry.material,source_id:'retry-update',content:'重试材料'};retry.entry.body+='\n\n新增段落。';
+ const done=await run(retry,c);assert.equal(done.status,'succeeded',JSON.stringify(done));assert.equal(done.object.revision,2);
 });

@@ -69,16 +69,29 @@ test('replacement creation is bound to the exact stored candidate and same libra
  for(const patch of [{content:'不同正文'},{folder_id:'wrong'},{filename:'other.md'},{kb_id:'formal-kb'}]){const r=await api.authorizeReplacementCreate(f.ctx,{...args,...patch});assert.equal(r.status,'conflict',JSON.stringify(r));}
  f.env.close();
 });
-test('governed Markdown keeps identity/source JSON, versions the revision and does not inherit verified status',async()=>{
+test('governed Markdown reads identity from the index, versions the revision and never embeds metadata',async()=>{
  assert.equal(typeof api.revisionArtifact,'function');const metadata={entry_id:'uuid',version:'1.0',title:'标题',primary_category:'learning',sources:[{kind:'book',locator:'p1'}],verification:'verified',body_sha256:await sha256('旧正文\n'),created_date:'2026-10-25'};
  const raw='# 标题\n\n```json\n'+JSON.stringify(metadata,null,2)+'\n```\n\n---\n\n旧正文\n';
- const layoutOnly=await api.revisionArtifact(raw,'旧正文\n','标题__概念__v1.0.md','2026-10-28');assert.ok(layoutOnly.content.startsWith('# 标题\n\n旧正文\n\n---\n'));await assert.rejects(()=>api.revisionArtifact(layoutOnly.content,layoutOnly.content,layoutOnly.filename,'2026-10-28'),/no_content_change/);
- const r=await api.revisionArtifact(raw,'新正文\n','标题__概念__v1.0.md','2026-10-28');assert.equal(r.filename,'标题__概念__v1.1.md');assert.match(r.content,/新正文/);const m=JSON.parse(r.content.match(/```json\n([\s\S]*?)\n```/)[1]);
- assert.ok(r.content.startsWith('# 标题\n\n新正文\n\n---\n\n```json\n'));assert.ok(r.content.trimEnd().endsWith('```'));
- assert.equal(m.entry_id,metadata.entry_id);assert.deepEqual(m.sources,metadata.sources);assert.equal(m.version,'1.1');assert.equal(m.previous_version,'1.0');assert.equal(m.verification,'pending');assert.equal(m.body_sha256,await sha256('新正文\n'));assert.equal(m.updated_date,'2026-10-28');
- const second=await api.revisionArtifact(r.content,'再修订正文\n',r.filename,'2026-10-28');assert.equal(second.version,'1.2');assert.ok(second.content.startsWith('# 标题\n\n再修订正文\n\n---\n\n```json\n'));const secondMeta=JSON.parse(second.content.match(/```json\n([\s\S]*?)\n```/)[1]);assert.equal(secondMeta.body_sha256,await sha256('再修订正文\n'));assert.equal(secondMeta.entry_id,metadata.entry_id);
+ // 旧格式文件仍可读取，改写后按新格式输出（去掉头部 JSON 与分隔线）。
+ const layoutOnly=await api.revisionArtifact(raw,'旧正文\n','标题__概念__v1.0.md','2026-10-28');assert.equal(layoutOnly.content,'# 标题\n\n旧正文\n');
+ await assert.rejects(()=>api.revisionArtifact(layoutOnly.content,layoutOnly.content,layoutOnly.filename,'2026-10-28'),/no_content_change/);
+ const r=await api.revisionArtifact(raw,'新正文\n','标题__概念__v1.0.md','2026-10-28');assert.equal(r.filename,'标题__概念__v1.1.md');assert.equal(r.content,'# 标题\n\n新正文\n');
+ assert.ok(!r.content.includes('```json')&&!r.content.includes('\n---\n'));assert.equal(r.body_sha256,await sha256('新正文\n'));
+ // 新格式文件没有元数据可解析，版本与身份由治理索引提供；调用方传入当前版本才能继续递增。
+ const second=await api.revisionArtifact(r.content,'再修订正文\n',r.filename,'2026-10-28',{...metadata,version:r.version});
+ assert.equal(second.version,'1.2');assert.equal(second.content,'# 标题\n\n再修订正文\n');assert.equal(second.body_sha256,await sha256('再修订正文\n'));
+ await assert.rejects(()=>api.revisionArtifact(r.content,'# 别的标题\n\n新正文\n','x.md','2026-10-28',metadata),/title_heading_changed/);
+ await assert.rejects(()=>api.revisionArtifact(r.content,'新正文\n','x.md','2026-10-28',{...metadata,entry_id:undefined}),/governed_identity_required/);
  const read=await api.revisionArtifact('# 普通卡\n\n原文\n','# 普通卡\n\n新文\n','plain.md','2026-10-28');assert.equal(read.content,'# 普通卡\n\n新文\n');assert.match(read.filename,/修订/);
 });
+test('headerless cards take their governed identity from the index instead of the file',async()=>{
+ const f=await fixture(),metadata={entry_id:'11111111-1111-5111-8111-111111111111',version:'1.0',title:'测试',primary_category:'learning',content_type:'concept',sources:[{kind:'book',locator:'p1'}],verification:'verified',body_sha256:await sha256('旧正文。\n')};
+ await f.ctx.store.put('governance_index','governed',{media_id:f.oldId,entry_id:metadata.entry_id,version:'1.0',metadata,filename:'测试.md',folder_id:f.folder});
+ const p=await f.preview('edit-headless','# 测试\n\n新正文。\n');assert.equal(p.status,'preview',JSON.stringify(p));
+ const content=p.replacement_plan.create_arguments.content;assert.equal(content,'# 测试\n\n新正文。\n');assert.ok(!content.includes('```json')&&!content.includes('\n---\n'));
+ assert.equal(p.preview.candidate.version,'1.1');f.env.close();
+});
+
 test('ambiguous metadata is blocked instead of dropped; request replay never changes the stored candidate',async()=>{
  assert.equal(typeof api.revisionArtifact,'function');await assert.rejects(()=>api.revisionArtifact('# 标题\n\n```json\n{broken\n','新正文','x.md','2026-10-28'));
  const f=await fixture(),p=await f.preview('same');assert.equal((await f.preview('same')).replacement_plan.request_id,p.request_id);assert.equal((await f.preview('same','另一个正文')).status,'conflict');f.env.close();
@@ -112,4 +125,13 @@ test('a late historical row follows consecutive replacements to the final live c
 test('cyclic replacement aliases fail closed instead of pointing at a deleted intermediate file',async()=>{
  const f=await fixture();await f.ctx.store.put('media_content_states',stable({kb_id:f.b.kb_id,media_id:f.oldId}),{state:'replaced',media_id:'second'});await f.ctx.store.put('media_content_states',stable({kb_id:f.b.kb_id,media_id:'second'}),{state:'replaced',media_id:f.oldId});
  await assert.rejects(()=>projectCurrentLocation(f.ctx,{media_id:f.oldId},f.b.kb_id),/ima_replacement_projection_cycle/);f.env.close();
+});
+
+test('repeated revisions keep a single version suffix instead of stacking rename tails',async()=>{
+ const meta={entry_id:'uuid-x',version:'1.0',title:'咖啡因',primary_category:'health',sources:[{kind:'web',locator:'x'}],verification:'pending',body_sha256:'x',created_date:'2026-11-01'};
+ const raw='# 咖啡因\n\n```json\n'+JSON.stringify(meta,null,2)+'\n```\n\n---\n\n第一版\n';
+ const a=await api.revisionArtifact(raw,'第二版\n','咖啡因.md','2026-11-01');assert.equal(a.filename,'咖啡因__v1.1.md');
+ const b=await api.revisionArtifact(a.content,'第三版\n',a.filename,'2026-11-01',{...meta,version:'1.1'});assert.equal(b.filename,'咖啡因__v1.2.md');
+ const legacy='# 咖啡因\n\n第三版\n';const c=await api.revisionArtifact(legacy,'第四版\n','咖啡因__修订_ab12cd34ef.md','2026-11-01',{...meta,version:'1.2'});assert.equal(c.filename,'咖啡因__v1.3.md');
+ const d=await api.revisionArtifact('# 咖啡因\n\n第四版\n','第五版\n','咖啡因__修订_b46f05b9b8__修订_33044933a9.md','2026-11-01',{...meta,version:'1.3'});assert.equal(d.filename,'咖啡因__v1.4.md');
 });

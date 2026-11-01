@@ -95,10 +95,10 @@
     "policy_version": "1.0.0",
     "body_sha256": "b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421"
   },
-  "content": "# 证据与学习😀\n\n```json\n{\n  \"aliases\": [],\n  \"body_sha256\": \"b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421\",\n  \"content_natures\": [\n    \"ai_synthesis\",\n    \"source_excerpt\"\n  ],\n  \"content_type\": \"concept\",\n  \"created_date\": \"2026-10-24\",\n  \"entry_id\": \"12345678-1234-5678-9234-567812345678\",\n  \"human_dimensions\": [],\n  \"life_goals\": [],\n  \"policy_version\": \"1.0.0\",\n  \"primary_category\": \"learning\",\n  \"sources\": [\n    {\n      \"author\": \"作者\",\n      \"kind\": \"url\",\n      \"locator\": \"https://example.org/paper\"\n    }\n  ],\n  \"tags\": [\n    \"乙\",\n    \"甲\",\n    \"\",\n    \"😀\"\n  ],\n  \"title\": \"证据与学习😀\",\n  \"updated_date\": \"2026-10-25\",\n  \"verification\": \"verified\",\n  \"verification_note\": \"已实际核查\",\n  \"version\": \"1.0\"\n}\n```\n\n---\n\n正文\n第二行\n结尾\n",
+  "content": "# 证据与学习😀\n\n正文\n第二行\n结尾\n",
   "filename": "证据与学习😀__概念__v1.0.md",
   "metadata_sha256": "4bbe5c54d69aac553c82bb5b8284d6f30103ad34a44cac60d3bc889e9976b5ae",
-  "content_sha256": "05f7b1de535438c4b5e73913bd0ab3b00cc344e88086a13c93a716868923b7ef",
+  "content_sha256": "2696dcb08fc273255f3bcd9372419ba6466e384ef871bfc5c50fa52e73c7f157",
   "body_sha256": "b98bd82010c07abbec193bf810cdf8d491a9356faaf143a5e969a4702a275421",
   "uuid5": "47ba2e8c-eb2f-5c78-875e-57c0d2dc08c2"
 }

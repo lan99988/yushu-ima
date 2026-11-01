@@ -111,7 +111,7 @@ function mapped(name,a){
     case 'ima_list_knowledge_bases':return ['kb',{action:'kb.addable',...args}];
     case 'ima_search_knowledge_bases':return ['kb',{action:'kb.list',...args}];
     case 'ima_get_knowledge_bases':return ['kb',{action:'kb.get',ids:args.ids}];
-    case 'ima_browse_knowledge':return ['kb',{action:'folder.list',kb_id:args.knowledge_base_id,folder_id:args.folder_id}];
+    case 'ima_browse_knowledge':return ['kb',{action:'folder.list',kb_id:args.knowledge_base_id,...(args.folder_id!==undefined?{folder_id:args.folder_id}:{})}];
     case 'ima_search_knowledge':return ['kb',{action:'knowledge.search',kb_id:args.knowledge_base_id,query:args.query}];
     case 'ima_get_media_info':return ['kb',{action:'media.info',...args}];
     case 'ima_import_webpages':return ['kb',{action:'url.import',kb_id:args.knowledge_base_id,folder_id:args.folder_id,urls:args.urls,...extra,execute:true}];

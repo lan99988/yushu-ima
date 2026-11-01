@@ -64,7 +64,7 @@ export function normalize(entry,p){schema(entry,SCHEMAS.entry,'entry');const e=s
  date(e.created_date);date(e.updated_date);if(e.updated_date<e.created_date)fail('updated_date_before_created_date');if(e.verification==='verified')requiredText(e.verification_note,'verification_note_required',4000);if(e.primary_category==='inbox')requiredText(e.classification_reason,'inbox_classification_reason_required',1000);for(const k of ['classification_reason','verification_note'])if(k in e)requiredText(e[k],k,4000);if('previous_version' in e)version(e.previous_version);if(e.related_entry_ids)e.related_entry_ids=[...new Set(e.related_entry_ids.map(uuid))].sort(cmp);
  e.body=requiredText(e.body,'body',p.entry_rules.body_max_utf8_bytes).replaceAll('\r\n','\n').replaceAll('\r','\n');if(!e.body.endsWith('\n'))e.body+='\n';if(new TextEncoder().encode(e.body).length>p.entry_rules.body_max_utf8_bytes)fail('body_utf8_size_limit');return e;
 }
-async function artifact(e,p,naming_profile){const {body,...rest}=e;const metadata={...rest,policy_version:p.policy_version,body_sha256:await sha(body)};const content='# '+e.title+'\n\n```json\n'+packed(metadata,2)+'\n```\n\n---\n\n'+body;const filename=naming_profile==='title_only_v1'?e.title+'.md':e.title+'__'+p.content_types[e.content_type]+'__v'+e.version+'.md';return {metadata,artifact:{filename,body_sha256:metadata.body_sha256,content_sha256:await sha(content),metadata_sha256:await sha(packed(metadata))},content};}
+async function artifact(e,p,naming_profile){const {body,...rest}=e;const metadata={...rest,policy_version:p.policy_version,body_sha256:await sha(body)};const content='# '+e.title+'\n\n'+body;const filename=naming_profile==='title_only_v1'?e.title+'.md':e.title+'__'+p.content_types[e.content_type]+'__v'+e.version+'.md';return {metadata,artifact:{filename,body_sha256:metadata.body_sha256,content_sha256:await sha(content),metadata_sha256:await sha(packed(metadata))},content};}
 async function all(store,c,prefix){const items=[];let cursor='';const seen=new Set();do{const r=await store.list(c,{prefix,limit:50,cursor});items.push(...r.items.map(x=>x.value));if(!r.has_more)break;if(!r.next_cursor||seen.has(r.next_cursor))fail('index_pagination_invalid','unavailable');cursor=r.next_cursor;seen.add(cursor);}while(true);return items;}
 export function currentEntryVersion(row){const v=['replaced','deleted_from_knowledge_base'].includes(row.current_content?.state)&&row.current_content.version?row.current_content.version:row.version;if(versionCmp(v,row.version)<0)fail('current_revision_version_drift','conflict');return v;}
 function decision(rows,e,a){const same=rows.filter(x=>x.entry_id===e.entry_id);for(const x of same)if(x.version===e.version){if(x.metadata_sha256===a.metadata_sha256&&x.filename===a.filename)return x;fail('same_version_has_different_content_or_metadata','conflict');}for(const x of rows)if(x.entry_id!==e.entry_id){if(x.body_sha256===a.body_sha256||x.current_content?.body_sha256===a.body_sha256)fail('duplicate_body_existing_entry:'+x.entry_id,'duplicate');const mergedIntoSameEntry=x.merged_into&&x.current_content?.state==='replaced'&&same.some(row=>row.media_id===x.current_content.media_id);if(!mergedIntoSameEntry&&(x.filename===a.filename||x.current_content?.filename===a.filename))fail('filename_already_indexed','conflict');}same.sort((x,y)=>versionCmp(x.version,y.version));if(same.length){const last=currentEntryVersion(same.at(-1));if(e.previous_version!==last||versionCmp(e.version,last)<=0)fail('revision_must_extend_current_indexed_version','conflict');}else if(e.version!=='1.0'||e.previous_version)fail('new_entry_must_start_at_1.0','conflict');return null;}
@@ -138,3 +138,25 @@ export async function governance(action,q,ctx){
  }catch(e){return {status:e.status||'unavailable',message:e.status?e.message:'governance_storage_or_transport_error'};}
 }
 export async function handleGovernanceBridge(q,ctx){return governance(q?.action,q,ctx);}
+
+// 明确未写入的失败需要交还版本号：只释放属于该请求自身的预留，
+// 否则该版本会被永久占用，后续合法提交会一直报 version_or_request_reserved。
+export async function releaseReservationForRequest(ctx,requestId){
+ const {scope}=await settings(ctx);
+ let released=0;
+ for(const collection of ['governance_requests','governance_reservations']){
+  let cursor='';const seen=new Set();
+  do{
+   const page=await ctx.store.list(collection,{prefix:scope+':',limit:100,cursor});
+   for(const {key,value} of page.items){
+    const owned=value?.request_id===requestId||(collection==='governance_requests'&&key===scope+':'+requestId);
+    if(!owned)continue;
+    await ctx.store.remove(collection,key);released++;
+   }
+   if(!page.has_more)break;
+   if(!page.next_cursor||seen.has(page.next_cursor))break;
+   cursor=page.next_cursor;seen.add(page.next_cursor);
+  }while(true);
+ }
+ return released;
+}

@@ -5,7 +5,7 @@ const mod=await import('../worker/governance.js').catch(()=>({}));
 const run=(a,q,c)=>mod.governance(a,q,c);
 const prepare=(q={})=>({policy_version:'1.0.0',request_id:'req-1',entry:structuredClone(golden.entry),...q});
 test('治理导出契约',()=>assert.equal(typeof mod.governance,'function'));
-test('Python金样正文/元数据/文件名和三个hash完全一致',async()=>{const r=await run('entry.prepare',prepare(),context());assert.equal(r.status,'preview');for(const k of ['filename','body_sha256','content_sha256','metadata_sha256'])assert.equal(r.artifact[k],golden[k],k);assert.deepEqual(r.metadata,golden.metadata);assert.equal(r.transport_request.content,golden.content);});
+test('金样正文/元数据/文件名和三个hash完全一致，且正文不再内嵌元数据',async()=>{const r=await run('entry.prepare',prepare(),context());assert.equal(r.status,'preview');for(const k of ['filename','body_sha256','content_sha256','metadata_sha256'])assert.equal(r.artifact[k],golden[k],k);assert.deepEqual(r.metadata,golden.metadata);assert.equal(r.transport_request.content,golden.content);assert.ok(!r.transport_request.content.includes('```json'));assert.ok(!r.transport_request.content.includes('\n---\n'));});
 test('optional title_only_v1 naming keeps content and legacy contract unchanged and binds its reservation',async()=>{
  const c=context(),q=prepare({naming_profile:'title_only_v1',entry:{...golden.entry,title:'鱼油'}});const p=await run('entry.prepare',q,c);assert.equal(p.status,'preview',JSON.stringify(p));assert.equal(p.transport_request.filename,'鱼油.md');
  c.receipt=await c.invoke('kb',{...p.transport_request,execute:true});assert.equal((await run('index.commit',{...q,media_id:'media-1'},c)).status,'succeeded');

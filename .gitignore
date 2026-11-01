@@ -16,3 +16,16 @@ outputs/
 *.log
 *.zip
 site.tar.gz
+
+wrangler.jsonc
+.openai/hosting.json
+
+.wrangler-local/
+local-server.mjs
+.dev.vars
+mcp-launcher.mjs
+capture-native-session.mjs
+native-session-status.json
+ima-init-governance.mjs
+
+.acceptance/
