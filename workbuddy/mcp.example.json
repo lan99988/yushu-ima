@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "yushu-ima": {
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/yushu-ima/mcp-launcher.mjs"
+      ],
+      "env": {
+        "IMA_PYTHON": "/ABSOLUTE/PATH/to/python",
+        "IMA_BRIDGE_PORT": "8787"
+      }
+    }
+  }
+}

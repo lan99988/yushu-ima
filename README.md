@@ -27,14 +27,15 @@
 - 标明摘要与正文的实际读取范围；部分观点核查不自动提升整卡状态。原稿、证据和内部管理记录在后台保留。
 - 直接在已连接的ChatGPT网页会话使用宿主检索/浏览能力和插件云端工具，无需本机脚本或WorkBuddy。其他类型事实与原样存档使用相应流程。
 
-完整规范：[观点提取与论文核查](plugin/skills/ima-cloud/references/claim-paper-review.md)。目录自动化、现卡归并及图片能力分别以所连接服务的实际工具、授权与验收状态为准；规则更新不自动升级服务实现，也不提供私有服务访问权限。
+完整规范：观点提取与论文核查。目录自动化、现卡归并及图片能力分别以所连接服务的实际工具、授权与验收状态为准；规则更新不自动升级服务实现，也不提供私有服务访问权限。
 
 ## 目录
 
 | 路径 | 用途 |
 | --- | --- |
 | `agent/ima_agent.py` | Python标准库实现的 MCP stdio / 命令行接入器 |
-| `plugin/` | 可移植插件清单、MCP模板、知识整理技能及参考规范 |
+| `plugin/` | 可移植插件清单、MCP模板、知识整理技能及参考规范（ChatGPT / OpenAI 宿主） |
+| `workbuddy/` | WorkBuddy 宿主适配：可直接复制的技能目录、MCP登记示例与运维手册；与 `plugin/` 并存，互不覆盖 |
 | `config/` | MCP客户端、后端环境和知识库绑定配置模板 |
 | `examples/` | 只读查询和不执行写入的预览参数示例 |
 | `worker/` | 云端 MCP、HTTP桥接、知识服务和原生维护实现 |
@@ -109,7 +110,17 @@ python agent/ima_agent.py call ima_knowledge_search --args-file examples/search.
 
 原作者已有的网页ChatGPT云端插件是独立部署的账号插件；本仓库提供其整理规则和服务实现，不会自动创建另一个人的ChatGPT插件或复制账号权限。
 
-## 方式三：部署自己的云端服务
+## 方式三：在 WorkBuddy 中使用
+
+`workbuddy/` 是 WorkBuddy 的宿主适配版，与方式二的 `plugin/` **并存**：`plugin/` 保留 ChatGPT 网页插件与 OAuth 写法，`workbuddy/` 改走本地桥，两者互不覆盖、互不共享配置，同时安装也不冲突。
+
+它包含可直接复制的技能目录（`workbuddy/skills/ima-cloud/`，含主卡规则、知识2.0规范、论文核查、目录归档、宿主适配与运维手册）、MCP 登记示例（`workbuddy/mcp.example.json`）和安装说明。安装三步：复制技能到 `~/.workbuddy/skills/`、把示例并入 `~/.workbuddy/mcp.json`、在 WorkBuddy 的自定义连接器里信任该服务。
+
+与插件版的差异只在宿主层：工具经 MCP 服务 `yushu-ima` 的本地桥（默认 `127.0.0.1:8787`）调用；工作区显式区分 `formal`（正式库）与 `isolated`（验收库）；改 `worker/*.js` 后必须 `npm run build`，否则桥仍加载旧的 `dist/` 产物。
+
+详见 [workbuddy/README.md](workbuddy/README.md)。
+
+## 方式四：部署自己的云端服务
 
 后端当前针对 **Sites 的可信所有者认证网关 + Cloudflare Worker / D1 / R2** 运行环境编写。生产部署必须保留可信网关；`worker/app.js` 依赖网关确认的所有者身份头。裸Worker的独立认证适配不在当前交付范围内。
 
