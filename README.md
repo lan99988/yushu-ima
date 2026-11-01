@@ -63,6 +63,8 @@ python scripts/install-workbuddy.py --url "https://你的站点/bridge/v1/mcp" -
 
 > 查一下我的知识库里有哪些目录
 
+能列出真实目录就算接通。接下来会发生什么、哪些现象是正常的、哪些红线不能碰，都写在 [实操经验](workbuddy/PLAYBOOK.md) 里。
+
 ## 连不上
 
 | 现象 | 多半是 |
@@ -176,7 +178,7 @@ Node.js 要求 22.13 或以上，服务测试使用 `node:sqlite`。示例 hosti
 | --- | --- |
 | `agent/ima_agent.py` | Python 标准库实现的 MCP stdio / 命令行接入器 |
 | `plugin/` | 可移植插件清单、MCP 模板、知识整理技能（ChatGPT / OpenAI 宿主） |
-| `workbuddy/` | WorkBuddy 宿主适配：可直接复制的技能目录、MCP 登记示例与运维手册 |
+| `workbuddy/` | WorkBuddy 宿主适配：技能目录、MCP 示例、[实操经验](workbuddy/PLAYBOOK.md)与运维手册 |
 | `config/` | MCP 客户端、后端环境与知识库绑定模板 |
 | `examples/` | 只读查询和不执行写入的预览参数示例 |
 | `worker/` | 云端 MCP、HTTP 桥接、知识服务和原生维护实现 |

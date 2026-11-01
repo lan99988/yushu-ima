@@ -42,6 +42,7 @@ python scripts/install-workbuddy.py --url "https://你的站点/bridge/v1/mcp" -
 ```text
 workbuddy/
 ├── README.md                 本文件
+├── PLAYBOOK.md               实操经验：跑通之后才明白的事
 ├── mcp.example.json          MCP 服务登记示例
 └── skills/ima-cloud/
     ├── SKILL.md              入口
@@ -60,8 +61,11 @@ workbuddy/
 ## 验证装好了
 
 ```text
-node probe-one.mjs ima_knowledge_policy '{}'
-node read-card.mjs <media_id> out.md
+python agent/ima_agent.py doctor
 ```
 
-第一条返回统一政策即桥已通；第二条能完整读回条目正文即链路已通。返回 `fetch failed` 是桥没起，不是服务不可用。
+返回工具清单和政策即接通。它只读不写。在对话里验证可以问一句「查一下我的知识库里有哪些目录」。
+
+跑通之后会遇到的正常现象、踩过的坑和安全红线，见 [实操经验](PLAYBOOK.md)。
+
+本机开发跑桥时才用到 `node probe-one.mjs` 这类脚本，它们依赖 Node 和 `dist/` 构建产物，普通安装用不上。
